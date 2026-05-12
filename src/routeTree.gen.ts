@@ -14,6 +14,7 @@ import { Route as CodersIndexRouteImport } from './routes/coders.index'
 import { Route as WorkspacesWorkspaceIdRouteImport } from './routes/workspaces.$workspaceId'
 import { Route as EarningsCoderIdRouteImport } from './routes/earnings.$coderId'
 import { Route as CodersCoderIdRouteImport } from './routes/coders.$coderId'
+import { Route as CodersCoderIdSettingsRouteImport } from './routes/coders.$coderId.settings'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -40,28 +41,36 @@ const CodersCoderIdRoute = CodersCoderIdRouteImport.update({
   path: '/coders/$coderId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CodersCoderIdSettingsRoute = CodersCoderIdSettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => CodersCoderIdRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/coders/$coderId': typeof CodersCoderIdRoute
+  '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
+  '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/coders/$coderId': typeof CodersCoderIdRoute
+  '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders': typeof CodersIndexRoute
+  '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/coders/$coderId': typeof CodersCoderIdRoute
+  '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
+  '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -71,6 +80,7 @@ export interface FileRouteTypes {
     | '/earnings/$coderId'
     | '/workspaces/$workspaceId'
     | '/coders/'
+    | '/coders/$coderId/settings'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -78,6 +88,7 @@ export interface FileRouteTypes {
     | '/earnings/$coderId'
     | '/workspaces/$workspaceId'
     | '/coders'
+    | '/coders/$coderId/settings'
   id:
     | '__root__'
     | '/'
@@ -85,11 +96,12 @@ export interface FileRouteTypes {
     | '/earnings/$coderId'
     | '/workspaces/$workspaceId'
     | '/coders/'
+    | '/coders/$coderId/settings'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  CodersCoderIdRoute: typeof CodersCoderIdRoute
+  CodersCoderIdRoute: typeof CodersCoderIdRouteWithChildren
   EarningsCoderIdRoute: typeof EarningsCoderIdRoute
   WorkspacesWorkspaceIdRoute: typeof WorkspacesWorkspaceIdRoute
   CodersIndexRoute: typeof CodersIndexRoute
@@ -132,12 +144,31 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodersCoderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/coders/$coderId/settings': {
+      id: '/coders/$coderId/settings'
+      path: '/settings'
+      fullPath: '/coders/$coderId/settings'
+      preLoaderRoute: typeof CodersCoderIdSettingsRouteImport
+      parentRoute: typeof CodersCoderIdRoute
+    }
   }
 }
 
+interface CodersCoderIdRouteChildren {
+  CodersCoderIdSettingsRoute: typeof CodersCoderIdSettingsRoute
+}
+
+const CodersCoderIdRouteChildren: CodersCoderIdRouteChildren = {
+  CodersCoderIdSettingsRoute: CodersCoderIdSettingsRoute,
+}
+
+const CodersCoderIdRouteWithChildren = CodersCoderIdRoute._addFileChildren(
+  CodersCoderIdRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  CodersCoderIdRoute: CodersCoderIdRoute,
+  CodersCoderIdRoute: CodersCoderIdRouteWithChildren,
   EarningsCoderIdRoute: EarningsCoderIdRoute,
   WorkspacesWorkspaceIdRoute: WorkspacesWorkspaceIdRoute,
   CodersIndexRoute: CodersIndexRoute,
@@ -145,3 +176,13 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
