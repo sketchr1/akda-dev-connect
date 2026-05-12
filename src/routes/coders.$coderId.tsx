@@ -40,7 +40,7 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder } = Route.useLoaderData();
+  const { coder } = Route.useLoaderData() as { coder: Coder };
   const status = statusConfig[coder.status];
 
   return (
