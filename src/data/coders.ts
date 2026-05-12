@@ -50,9 +50,7 @@ export const coders: Coder[] = [
       { title: "Hatid Wallet", description: "Cross-border remittance infra processing $4M/month with sub-second settlement.", image: portfolio1, client: "Hatid Financial" },
       { title: "Reps Tracker", description: "Native iOS fitness companion with adaptive program engine.", image: portfolio2, client: "Studio Ironwood" },
     ],
-  },
-  {
-    id: "kenji-arroyo",
+    discord: { handle: "miracode#7421", verified: true },
     name: "Kenji Arroyo",
     handle: "@kenji.dev",
     title: "Backend & infra · Java / Kotlin",
