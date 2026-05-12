@@ -27,6 +27,7 @@ export interface Coder {
   initials: string;
   accent: string;
   portfolio: PortfolioItem[];
+  discord?: { handle: string; verified: boolean };
 }
 
 export const coders: Coder[] = [
