@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import {
@@ -11,6 +11,7 @@ import {
   MessageSquare,
   RefreshCw,
   Send,
+  ShieldAlert,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -62,6 +63,13 @@ function WorkspacePage() {
   const [draft, setDraft] = useState("");
   const [role, setRole] = useState<Role>("customer");
   const [commendOpen, setCommendOpen] = useState(false);
+  const [typing, setTyping] = useState<Role | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, typing]);
 
   const stageIndex = stageOrder.indexOf(stage);
   const released = stage === "released";
@@ -114,17 +122,44 @@ function WorkspacePage() {
   };
 
   const handleSend = () => {
-    if (!draft.trim()) return;
+    const text = draft.trim();
+    if (!text) return;
+    if (text.length > 1000) {
+      toast.error("Message too long", { description: "Keep it under 1000 characters." });
+      return;
+    }
+    // Naive off-platform payment detection — show inline coaching
+    const offPlatform = /\b(paypal|venmo|gcash|zelle|bank transfer|wire|wechat|cashapp)\b/i;
+    if (offPlatform.test(text)) {
+      toast.warning("Off-platform payment detected", { description: "Keep payments inside Akda to stay covered." });
+    }
+
     setMessages((m) => [
       ...m,
       {
         from: role,
         author: role === "customer" ? data.workspace.customerName : coder.name,
-        body: draft.trim(),
+        body: text,
         timestamp: "just now",
       },
     ]);
     setDraft("");
+
+    // Simulate live reply from the other side
+    const other: Role = role === "customer" ? "coder" : "customer";
+    setTyping(other);
+    setTimeout(() => {
+      setTyping(null);
+      setMessages((m) => [
+        ...m,
+        {
+          from: other,
+          author: other === "customer" ? data.workspace.customerName : coder.name,
+          body: other === "coder" ? "Got it — looking now." : "Thanks, will review shortly.",
+          timestamp: "just now",
+        },
+      ]);
+    }, 1400);
   };
 
   const submitCommendation = ({ rating, note }: { rating: number; note: string }) => {
