@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import confetti from "canvas-confetti";
 import { toast } from "sonner";
 import {
@@ -11,6 +11,7 @@ import {
   MessageSquare,
   RefreshCw,
   Send,
+  ShieldAlert,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
@@ -62,6 +63,13 @@ function WorkspacePage() {
   const [draft, setDraft] = useState("");
   const [role, setRole] = useState<Role>("customer");
   const [commendOpen, setCommendOpen] = useState(false);
+  const [typing, setTyping] = useState<Role | null>(null);
+  const [bannerDismissed, setBannerDismissed] = useState(false);
+  const scrollRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
+  }, [messages, typing]);
 
   const stageIndex = stageOrder.indexOf(stage);
   const released = stage === "released";
@@ -114,17 +122,44 @@ function WorkspacePage() {
   };
 
   const handleSend = () => {
-    if (!draft.trim()) return;
+    const text = draft.trim();
+    if (!text) return;
+    if (text.length > 1000) {
+      toast.error("Message too long", { description: "Keep it under 1000 characters." });
+      return;
+    }
+    // Naive off-platform payment detection — show inline coaching
+    const offPlatform = /\b(paypal|venmo|gcash|zelle|bank transfer|wire|wechat|cashapp)\b/i;
+    if (offPlatform.test(text)) {
+      toast.warning("Off-platform payment detected", { description: "Keep payments inside Akda to stay covered." });
+    }
+
     setMessages((m) => [
       ...m,
       {
         from: role,
         author: role === "customer" ? data.workspace.customerName : coder.name,
-        body: draft.trim(),
+        body: text,
         timestamp: "just now",
       },
     ]);
     setDraft("");
+
+    // Simulate live reply from the other side
+    const other: Role = role === "customer" ? "coder" : "customer";
+    setTyping(other);
+    setTimeout(() => {
+      setTyping(null);
+      setMessages((m) => [
+        ...m,
+        {
+          from: other,
+          author: other === "customer" ? data.workspace.customerName : coder.name,
+          body: other === "coder" ? "Got it — looking now." : "Thanks, will review shortly.",
+          timestamp: "just now",
+        },
+      ]);
+    }, 1400);
   };
 
   const submitCommendation = ({ rating, note }: { rating: number; note: string }) => {
@@ -281,10 +316,33 @@ function WorkspacePage() {
               <p className="flex items-center gap-2 font-mono text-[10px] uppercase tracking-wider text-akda">
                 <MessageSquare className="h-3 w-3" /> Workspace chat
               </p>
-              <span className="font-mono text-[10px] text-muted-foreground">end-to-end private</span>
+              <span className="inline-flex items-center gap-1.5 font-mono text-[10px] text-muted-foreground">
+                <span className="relative flex h-2 w-2">
+                  <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-status-open opacity-75" />
+                  <span className="relative inline-flex h-2 w-2 rounded-full bg-status-open" />
+                </span>
+                Live · encrypted
+              </span>
             </div>
 
-            <div className="flex-1 space-y-3 overflow-y-auto p-5">
+            {/* Safety warning banner */}
+            {!bannerDismissed && (
+              <div className="mx-3 mt-3 flex items-start gap-2.5 rounded-xl border border-status-working/30 bg-status-working/5 p-3">
+                <ShieldAlert className="mt-0.5 h-4 w-4 shrink-0 text-status-working" />
+                <p className="flex-1 text-xs leading-relaxed text-foreground/85">
+                  Keep payments and file transfers within Akda to stay protected by our Escrow guarantee.
+                </p>
+                <button
+                  onClick={() => setBannerDismissed(true)}
+                  className="font-mono text-[10px] uppercase tracking-wider text-muted-foreground hover:text-foreground"
+                  aria-label="Dismiss safety banner"
+                >
+                  Got it
+                </button>
+              </div>
+            )}
+
+            <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto p-5">
               {messages.map((m, i) => {
                 if (m.from === "system") {
                   return (
@@ -309,6 +367,16 @@ function WorkspacePage() {
                   </div>
                 );
               })}
+
+              {typing && (
+                <div className={`flex ${typing === "coder" ? "justify-start" : "justify-end"}`}>
+                  <div className="flex items-center gap-1.5 rounded-2xl bg-surface px-3 py-2.5">
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.3s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground [animation-delay:-0.15s]" />
+                    <span className="h-1.5 w-1.5 animate-bounce rounded-full bg-muted-foreground" />
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="border-t border-border p-3">

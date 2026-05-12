@@ -27,6 +27,7 @@ export interface Coder {
   initials: string;
   accent: string;
   portfolio: PortfolioItem[];
+  discord?: { handle: string; verified: boolean };
 }
 
 export const coders: Coder[] = [
@@ -49,6 +50,7 @@ export const coders: Coder[] = [
       { title: "Hatid Wallet", description: "Cross-border remittance infra processing $4M/month with sub-second settlement.", image: portfolio1, client: "Hatid Financial" },
       { title: "Reps Tracker", description: "Native iOS fitness companion with adaptive program engine.", image: portfolio2, client: "Studio Ironwood" },
     ],
+    discord: { handle: "miracode#7421", verified: true },
   },
   {
     id: "kenji-arroyo",
@@ -89,6 +91,7 @@ export const coders: Coder[] = [
       { title: "Lumen DS", description: "Open-source design system adopted by 40+ engineering teams.", image: portfolio2, client: "Lumen Co." },
       { title: "Fold Editor", description: "Collaborative document editor with real-time presence.", image: portfolio1, client: "Fold Inc." },
     ],
+    discord: { handle: "aileenpark", verified: true },
   },
   {
     id: "diego-marquez",
@@ -108,6 +111,7 @@ export const coders: Coder[] = [
     portfolio: [
       { title: "Stockwatch CV", description: "Shelf monitoring across 800 retail stores using on-device vision.", image: portfolio3, client: "Stockwatch" },
     ],
+    discord: { handle: "diegoml", verified: false },
   },
   {
     id: "noor-rahman",
