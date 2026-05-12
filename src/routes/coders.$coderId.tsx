@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Award, CheckCircle2, Clock, MapPin, MessageSquare } from "lucide-react";
+import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
 
@@ -108,12 +108,51 @@ function CoderProfile() {
             <h2 className="font-mono text-xs uppercase tracking-wider text-akda">About</h2>
             <p className="mt-3 text-lg leading-relaxed text-foreground/90">{coder.bio}</p>
           </div>
-          <div>
-            <h2 className="font-mono text-xs uppercase tracking-wider text-akda">Fluency</h2>
-            <div className="mt-3 flex flex-wrap gap-2">
-              {coder.fluency.map((t) => (
-                <span key={t} className="rounded-md border border-border bg-surface-elevated px-2.5 py-1 font-mono text-xs">{t}</span>
-              ))}
+          <div className="space-y-6">
+            <div>
+              <h2 className="font-mono text-xs uppercase tracking-wider text-akda">Fluency</h2>
+              <div className="mt-3 flex flex-wrap gap-2">
+                {coder.fluency.map((t) => (
+                  <span key={t} className="rounded-md border border-border bg-surface-elevated px-2.5 py-1 font-mono text-xs">{t}</span>
+                ))}
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center justify-between">
+                <h2 className="font-mono text-xs uppercase tracking-wider text-akda">Casual chat</h2>
+                <Link
+                  to="/coders/$coderId/settings"
+                  params={{ coderId: coder.id }}
+                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  aria-label="Edit settings"
+                >
+                  <Settings className="h-3.5 w-3.5" />
+                </Link>
+              </div>
+              {coder.discord ? (
+                <div className="mt-3 flex items-center gap-3 rounded-xl border border-border bg-surface p-3">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#5865F2]/15 text-[#7c8aff]">
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="h-4 w-4" aria-hidden>
+                      <path d="M20.317 4.369a19.79 19.79 0 0 0-4.885-1.515.074.074 0 0 0-.078.037c-.21.375-.444.864-.608 1.249a18.27 18.27 0 0 0-5.487 0 12.66 12.66 0 0 0-.617-1.25.077.077 0 0 0-.078-.036c-1.714.296-3.354.815-4.885 1.515a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.056 19.9 19.9 0 0 0 5.993 3.03.077.077 0 0 0 .084-.027c.461-.63.873-1.295 1.226-1.994a.076.076 0 0 0-.041-.105 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128c.126-.094.252-.192.372-.291a.074.074 0 0 1 .077-.01c3.927 1.793 8.18 1.793 12.061 0a.074.074 0 0 1 .078.009c.12.099.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.04.106c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.84 19.84 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.673-3.549-13.66a.06.06 0 0 0-.031-.028zM8.02 15.331c-1.182 0-2.157-1.085-2.157-2.418 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.956 2.417-2.157 2.417zm7.974 0c-1.182 0-2.157-1.085-2.157-2.418 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.332-.946 2.417-2.157 2.417z" />
+                    </svg>
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <div className="flex items-center gap-1.5">
+                      <p className="truncate font-mono text-sm">{coder.discord.handle}</p>
+                      {coder.discord.verified && (
+                        <span title="Verified link" className="inline-flex items-center gap-0.5 rounded-full border border-akda/30 bg-akda/10 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wider text-akda">
+                          <BadgeCheck className="h-3 w-3" /> Verified
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-muted-foreground">
+                      {coder.discord.verified ? "Casual chat — payments must stay on Akda." : "Self-reported, not verified by Akda."}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <p className="mt-3 text-xs text-muted-foreground">No external chat linked.</p>
+              )}
             </div>
           </div>
         </div>
