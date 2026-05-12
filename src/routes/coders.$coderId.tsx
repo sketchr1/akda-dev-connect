@@ -75,6 +75,14 @@ function CoderProfile() {
                 <MessageSquare className="h-4 w-4" /> Send a brief
               </button>
               <p className="font-mono text-xs text-muted-foreground">${coder.hourlyRate}/hr · responds in ~3h</p>
+              <div className="mt-2 flex gap-2 text-xs">
+                <Link to="/workspaces/$workspaceId" params={{ workspaceId: "ws-001" }} className="rounded-lg border border-border bg-surface px-3 py-1.5 text-muted-foreground transition-colors hover:border-akda/50 hover:text-foreground">
+                  Demo workspace
+                </Link>
+                <Link to="/earnings/$coderId" params={{ coderId: coder.id }} className="rounded-lg border border-border bg-surface px-3 py-1.5 text-muted-foreground transition-colors hover:border-akda/50 hover:text-foreground">
+                  Earnings
+                </Link>
+              </div>
             </div>
           </div>
 
