@@ -111,7 +111,7 @@ export const coders: Coder[] = [
     portfolio: [
       { title: "Stockwatch CV", description: "Shelf monitoring across 800 retail stores using on-device vision.", image: portfolio3, client: "Stockwatch" },
     ],
-    discord: { handle: "noor.codes", verified: false },
+    discord: { handle: "diegoml", verified: false },
   },
   {
     id: "noor-rahman",
