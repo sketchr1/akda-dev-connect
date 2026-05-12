@@ -1,13 +1,13 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { ArrowLeft, Award, CheckCircle2, Clock, MapPin, MessageSquare } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
-import { getCoder, statusConfig } from "@/data/coders";
+import { getCoder, statusConfig, type Coder } from "@/data/coders";
 
 export const Route = createFileRoute("/coders/$coderId")({
-  loader: ({ params }) => {
+  loader: ({ params }): { coder: Coder } => {
     const coder = getCoder(params.coderId);
     if (!coder) throw notFound();
-    return { coder } as { coder: NonNullable<ReturnType<typeof getCoder>> };
+    return { coder };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
