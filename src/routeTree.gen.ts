@@ -10,33 +10,53 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as CodersIndexRouteImport } from './routes/coders.index'
+import { Route as CodersCoderIdRouteImport } from './routes/coders.$coderId'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CodersIndexRoute = CodersIndexRouteImport.update({
+  id: '/coders/',
+  path: '/coders/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CodersCoderIdRoute = CodersCoderIdRouteImport.update({
+  id: '/coders/$coderId',
+  path: '/coders/$coderId',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/coders/$coderId': typeof CodersCoderIdRoute
+  '/coders/': typeof CodersIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/coders/$coderId': typeof CodersCoderIdRoute
+  '/coders': typeof CodersIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/coders/$coderId': typeof CodersCoderIdRoute
+  '/coders/': typeof CodersIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths: '/' | '/coders/$coderId' | '/coders/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to: '/' | '/coders/$coderId' | '/coders'
+  id: '__root__' | '/' | '/coders/$coderId' | '/coders/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  CodersCoderIdRoute: typeof CodersCoderIdRoute
+  CodersIndexRoute: typeof CodersIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -48,12 +68,38 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/coders/': {
+      id: '/coders/'
+      path: '/coders'
+      fullPath: '/coders/'
+      preLoaderRoute: typeof CodersIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/coders/$coderId': {
+      id: '/coders/$coderId'
+      path: '/coders/$coderId'
+      fullPath: '/coders/$coderId'
+      preLoaderRoute: typeof CodersCoderIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  CodersCoderIdRoute: CodersCoderIdRoute,
+  CodersIndexRoute: CodersIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
