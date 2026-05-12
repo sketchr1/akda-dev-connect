@@ -51,6 +51,9 @@ export const coders: Coder[] = [
       { title: "Reps Tracker", description: "Native iOS fitness companion with adaptive program engine.", image: portfolio2, client: "Studio Ironwood" },
     ],
     discord: { handle: "miracode#7421", verified: true },
+  },
+  {
+    id: "kenji-arroyo",
     name: "Kenji Arroyo",
     handle: "@kenji.dev",
     title: "Backend & infra · Java / Kotlin",
