@@ -7,7 +7,7 @@ export const Route = createFileRoute("/coders/$coderId")({
   loader: ({ params }) => {
     const coder = getCoder(params.coderId);
     if (!coder) throw notFound();
-    return { coder };
+    return { coder } as { coder: NonNullable<ReturnType<typeof getCoder>> };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
