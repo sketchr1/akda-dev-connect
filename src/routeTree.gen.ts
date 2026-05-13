@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CodersIndexRouteImport } from './routes/coders.index'
 import { Route as WorkspacesWorkspaceIdRouteImport } from './routes/workspaces.$workspaceId'
+import { Route as OnboardingCoderRouteImport } from './routes/onboarding.coder'
 import { Route as EarningsCoderIdRouteImport } from './routes/earnings.$coderId'
 import { Route as CodersCoderIdRouteImport } from './routes/coders.$coderId'
 import { Route as CodersCoderIdSettingsRouteImport } from './routes/coders.$coderId.settings'
@@ -43,6 +44,11 @@ const WorkspacesWorkspaceIdRoute = WorkspacesWorkspaceIdRouteImport.update({
   path: '/workspaces/$workspaceId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingCoderRoute = OnboardingCoderRouteImport.update({
+  id: '/onboarding/coder',
+  path: '/onboarding/coder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EarningsCoderIdRoute = EarningsCoderIdRouteImport.update({
   id: '/earnings/$coderId',
   path: '/earnings/$coderId',
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/signup': typeof SignupRoute
   '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
+  '/onboarding/coder': typeof OnboardingCoderRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/signup': typeof SignupRoute
   '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
+  '/onboarding/coder': typeof OnboardingCoderRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/signup': typeof SignupRoute
   '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
+  '/onboarding/coder': typeof OnboardingCoderRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/coders/$coderId'
     | '/earnings/$coderId'
+    | '/onboarding/coder'
     | '/workspaces/$workspaceId'
     | '/coders/'
     | '/coders/$coderId/settings'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/coders/$coderId'
     | '/earnings/$coderId'
+    | '/onboarding/coder'
     | '/workspaces/$workspaceId'
     | '/coders'
     | '/coders/$coderId/settings'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/signup'
     | '/coders/$coderId'
     | '/earnings/$coderId'
+    | '/onboarding/coder'
     | '/workspaces/$workspaceId'
     | '/coders/'
     | '/coders/$coderId/settings'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   SignupRoute: typeof SignupRoute
   CodersCoderIdRoute: typeof CodersCoderIdRouteWithChildren
   EarningsCoderIdRoute: typeof EarningsCoderIdRoute
+  OnboardingCoderRoute: typeof OnboardingCoderRoute
   WorkspacesWorkspaceIdRoute: typeof WorkspacesWorkspaceIdRoute
   CodersIndexRoute: typeof CodersIndexRoute
 }
@@ -168,6 +181,13 @@ declare module '@tanstack/react-router' {
       path: '/workspaces/$workspaceId'
       fullPath: '/workspaces/$workspaceId'
       preLoaderRoute: typeof WorkspacesWorkspaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/onboarding/coder': {
+      id: '/onboarding/coder'
+      path: '/onboarding/coder'
+      fullPath: '/onboarding/coder'
+      preLoaderRoute: typeof OnboardingCoderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/earnings/$coderId': {
@@ -212,6 +232,7 @@ const rootRouteChildren: RootRouteChildren = {
   SignupRoute: SignupRoute,
   CodersCoderIdRoute: CodersCoderIdRouteWithChildren,
   EarningsCoderIdRoute: EarningsCoderIdRoute,
+  OnboardingCoderRoute: OnboardingCoderRoute,
   WorkspacesWorkspaceIdRoute: WorkspacesWorkspaceIdRoute,
   CodersIndexRoute: CodersIndexRoute,
 }

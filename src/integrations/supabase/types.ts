@@ -14,6 +14,53 @@ export type Database = {
   }
   public: {
     Tables: {
+      coder_profiles: {
+        Row: {
+          bio: string | null
+          created_at: string
+          fluency: string[]
+          headline: string | null
+          home_language: string | null
+          hourly_rate_usd: number | null
+          location: string | null
+          portfolio_urls: string[]
+          profile_id: string
+          updated_at: string
+        }
+        Insert: {
+          bio?: string | null
+          created_at?: string
+          fluency?: string[]
+          headline?: string | null
+          home_language?: string | null
+          hourly_rate_usd?: number | null
+          location?: string | null
+          portfolio_urls?: string[]
+          profile_id: string
+          updated_at?: string
+        }
+        Update: {
+          bio?: string | null
+          created_at?: string
+          fluency?: string[]
+          headline?: string | null
+          home_language?: string | null
+          hourly_rate_usd?: number | null
+          location?: string | null
+          portfolio_urls?: string[]
+          profile_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "coder_profiles_profile_id_fkey"
+            columns: ["profile_id"]
+            isOneToOne: true
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
