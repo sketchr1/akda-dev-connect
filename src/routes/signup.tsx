@@ -70,7 +70,11 @@ function SignUpPage() {
       return;
     }
     toast.success("Account created. Check your email to confirm.");
-    navigate({ to: "/" });
+    if (selectedRole === "coder") {
+      navigate({ to: "/onboarding/coder" });
+    } else {
+      navigate({ to: "/" });
+    }
   }
 
   async function handleGoogle() {
