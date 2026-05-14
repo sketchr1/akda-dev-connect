@@ -1,1 +1,7 @@
 project_id = "lcwzqgfrhzvdjfhvgedk"
+
+[functions.create-payment-intent]
+verify_jwt = true
+
+[functions.confirm-escrow-funded]
+verify_jwt = true
