@@ -65,6 +65,7 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          payment_intent_id: string | null
           project_id: string
           status: Database["public"]["Enums"]["escrow_status"]
           updated_at: string
@@ -72,6 +73,7 @@ export type Database = {
         Insert: {
           created_at?: string
           id?: string
+          payment_intent_id?: string | null
           project_id: string
           status?: Database["public"]["Enums"]["escrow_status"]
           updated_at?: string
@@ -79,6 +81,7 @@ export type Database = {
         Update: {
           created_at?: string
           id?: string
+          payment_intent_id?: string | null
           project_id?: string
           status?: Database["public"]["Enums"]["escrow_status"]
           updated_at?: string
@@ -204,7 +207,12 @@ export type Database = {
     Enums: {
       app_role: "coder" | "customer"
       escrow_status: "pending" | "funded" | "released" | "refunded"
-      project_status: "open" | "in_progress" | "completed" | "cancelled"
+      project_status:
+        | "open"
+        | "in_progress"
+        | "completed"
+        | "cancelled"
+        | "active"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -334,7 +342,13 @@ export const Constants = {
     Enums: {
       app_role: ["coder", "customer"],
       escrow_status: ["pending", "funded", "released", "refunded"],
-      project_status: ["open", "in_progress", "completed", "cancelled"],
+      project_status: [
+        "open",
+        "in_progress",
+        "completed",
+        "cancelled",
+        "active",
+      ],
     },
   },
 } as const
