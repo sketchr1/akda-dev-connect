@@ -24,7 +24,13 @@ export function SiteHeader() {
         <div className="flex items-center gap-3">
           {loading ? null : user ? (
             <>
-              <span className="hidden text-sm text-muted-foreground md:block">{user.email}</span>
+              <Link
+                to="/projects/new"
+                className="hidden rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20 md:inline-flex"
+              >
+                Post a project
+              </Link>
+              <span className="hidden text-sm text-muted-foreground lg:block">{user.email}</span>
               <button
                 onClick={() => supabase.auth.signOut()}
                 className="inline-flex items-center gap-1.5 rounded-lg border border-border px-3 py-2 text-sm text-muted-foreground transition-colors hover:text-foreground"
