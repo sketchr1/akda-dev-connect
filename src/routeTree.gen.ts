@@ -18,6 +18,7 @@ import { Route as ProjectsNewRouteImport } from './routes/projects.new'
 import { Route as OnboardingCoderRouteImport } from './routes/onboarding.coder'
 import { Route as EarningsCoderIdRouteImport } from './routes/earnings.$coderId'
 import { Route as CodersCoderIdRouteImport } from './routes/coders.$coderId'
+import { Route as ProjectsProjectIdPayRouteImport } from './routes/projects.$projectId.pay'
 import { Route as CodersCoderIdSettingsRouteImport } from './routes/coders.$coderId.settings'
 
 const SignupRoute = SignupRouteImport.update({
@@ -65,6 +66,11 @@ const CodersCoderIdRoute = CodersCoderIdRouteImport.update({
   path: '/coders/$coderId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsProjectIdPayRoute = ProjectsProjectIdPayRouteImport.update({
+  id: '/projects/$projectId/pay',
+  path: '/projects/$projectId/pay',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CodersCoderIdSettingsRoute = CodersCoderIdSettingsRouteImport.update({
   id: '/settings',
   path: '/settings',
@@ -82,6 +88,7 @@ export interface FileRoutesByFullPath {
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
+  '/projects/$projectId/pay': typeof ProjectsProjectIdPayRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -94,6 +101,7 @@ export interface FileRoutesByTo {
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
+  '/projects/$projectId/pay': typeof ProjectsProjectIdPayRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -107,6 +115,7 @@ export interface FileRoutesById {
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
+  '/projects/$projectId/pay': typeof ProjectsProjectIdPayRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -121,6 +130,7 @@ export interface FileRouteTypes {
     | '/workspaces/$workspaceId'
     | '/coders/'
     | '/coders/$coderId/settings'
+    | '/projects/$projectId/pay'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -133,6 +143,7 @@ export interface FileRouteTypes {
     | '/workspaces/$workspaceId'
     | '/coders'
     | '/coders/$coderId/settings'
+    | '/projects/$projectId/pay'
   id:
     | '__root__'
     | '/'
@@ -145,6 +156,7 @@ export interface FileRouteTypes {
     | '/workspaces/$workspaceId'
     | '/coders/'
     | '/coders/$coderId/settings'
+    | '/projects/$projectId/pay'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -157,6 +169,7 @@ export interface RootRouteChildren {
   ProjectsNewRoute: typeof ProjectsNewRoute
   WorkspacesWorkspaceIdRoute: typeof WorkspacesWorkspaceIdRoute
   CodersIndexRoute: typeof CodersIndexRoute
+  ProjectsProjectIdPayRoute: typeof ProjectsProjectIdPayRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -224,6 +237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CodersCoderIdRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/projects/$projectId/pay': {
+      id: '/projects/$projectId/pay'
+      path: '/projects/$projectId/pay'
+      fullPath: '/projects/$projectId/pay'
+      preLoaderRoute: typeof ProjectsProjectIdPayRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/coders/$coderId/settings': {
       id: '/coders/$coderId/settings'
       path: '/settings'
@@ -256,7 +276,18 @@ const rootRouteChildren: RootRouteChildren = {
   ProjectsNewRoute: ProjectsNewRoute,
   WorkspacesWorkspaceIdRoute: WorkspacesWorkspaceIdRoute,
   CodersIndexRoute: CodersIndexRoute,
+  ProjectsProjectIdPayRoute: ProjectsProjectIdPayRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { startInstance } from './start.ts'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+    config: Awaited<ReturnType<typeof startInstance.getOptions>>
+  }
+}
