@@ -61,6 +61,38 @@ export type Database = {
           },
         ]
       }
+      escrow: {
+        Row: {
+          created_at: string
+          id: string
+          project_id: string
+          status: Database["public"]["Enums"]["escrow_status"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          project_id: string
+          status?: Database["public"]["Enums"]["escrow_status"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          project_id?: string
+          status?: Database["public"]["Enums"]["escrow_status"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "escrow_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: true
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       profiles: {
         Row: {
           created_at: string
@@ -87,6 +119,53 @@ export type Database = {
           username?: string | null
         }
         Relationships: []
+      }
+      projects: {
+        Row: {
+          budget_usd: number
+          created_at: string
+          customer_id: string
+          deadline: string
+          description: string
+          id: string
+          skills: string[]
+          status: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget_usd: number
+          created_at?: string
+          customer_id: string
+          deadline: string
+          description: string
+          id?: string
+          skills?: string[]
+          status?: Database["public"]["Enums"]["project_status"]
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget_usd?: number
+          created_at?: string
+          customer_id?: string
+          deadline?: string
+          description?: string
+          id?: string
+          skills?: string[]
+          status?: Database["public"]["Enums"]["project_status"]
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "projects_customer_id_fkey"
+            columns: ["customer_id"]
+            isOneToOne: false
+            referencedRelation: "profiles"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
@@ -124,6 +203,8 @@ export type Database = {
     }
     Enums: {
       app_role: "coder" | "customer"
+      escrow_status: "pending" | "funded" | "released" | "refunded"
+      project_status: "open" | "in_progress" | "completed" | "cancelled"
     }
     CompositeTypes: {
       [_ in never]: never
@@ -252,6 +333,8 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["coder", "customer"],
+      escrow_status: ["pending", "funded", "released", "refunded"],
+      project_status: ["open", "in_progress", "completed", "cancelled"],
     },
   },
 } as const
