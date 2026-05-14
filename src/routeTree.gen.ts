@@ -14,6 +14,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as CodersIndexRouteImport } from './routes/coders.index'
 import { Route as WorkspacesWorkspaceIdRouteImport } from './routes/workspaces.$workspaceId'
+import { Route as ProjectsNewRouteImport } from './routes/projects.new'
 import { Route as OnboardingCoderRouteImport } from './routes/onboarding.coder'
 import { Route as EarningsCoderIdRouteImport } from './routes/earnings.$coderId'
 import { Route as CodersCoderIdRouteImport } from './routes/coders.$coderId'
@@ -44,6 +45,11 @@ const WorkspacesWorkspaceIdRoute = WorkspacesWorkspaceIdRouteImport.update({
   path: '/workspaces/$workspaceId',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ProjectsNewRoute = ProjectsNewRouteImport.update({
+  id: '/projects/new',
+  path: '/projects/new',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const OnboardingCoderRoute = OnboardingCoderRouteImport.update({
   id: '/onboarding/coder',
   path: '/onboarding/coder',
@@ -72,6 +78,7 @@ export interface FileRoutesByFullPath {
   '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
   '/onboarding/coder': typeof OnboardingCoderRoute
+  '/projects/new': typeof ProjectsNewRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
@@ -83,6 +90,7 @@ export interface FileRoutesByTo {
   '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
   '/onboarding/coder': typeof OnboardingCoderRoute
+  '/projects/new': typeof ProjectsNewRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
@@ -95,6 +103,7 @@ export interface FileRoutesById {
   '/coders/$coderId': typeof CodersCoderIdRouteWithChildren
   '/earnings/$coderId': typeof EarningsCoderIdRoute
   '/onboarding/coder': typeof OnboardingCoderRoute
+  '/projects/new': typeof ProjectsNewRoute
   '/workspaces/$workspaceId': typeof WorkspacesWorkspaceIdRoute
   '/coders/': typeof CodersIndexRoute
   '/coders/$coderId/settings': typeof CodersCoderIdSettingsRoute
@@ -108,6 +117,7 @@ export interface FileRouteTypes {
     | '/coders/$coderId'
     | '/earnings/$coderId'
     | '/onboarding/coder'
+    | '/projects/new'
     | '/workspaces/$workspaceId'
     | '/coders/'
     | '/coders/$coderId/settings'
@@ -119,6 +129,7 @@ export interface FileRouteTypes {
     | '/coders/$coderId'
     | '/earnings/$coderId'
     | '/onboarding/coder'
+    | '/projects/new'
     | '/workspaces/$workspaceId'
     | '/coders'
     | '/coders/$coderId/settings'
@@ -130,6 +141,7 @@ export interface FileRouteTypes {
     | '/coders/$coderId'
     | '/earnings/$coderId'
     | '/onboarding/coder'
+    | '/projects/new'
     | '/workspaces/$workspaceId'
     | '/coders/'
     | '/coders/$coderId/settings'
@@ -142,6 +154,7 @@ export interface RootRouteChildren {
   CodersCoderIdRoute: typeof CodersCoderIdRouteWithChildren
   EarningsCoderIdRoute: typeof EarningsCoderIdRoute
   OnboardingCoderRoute: typeof OnboardingCoderRoute
+  ProjectsNewRoute: typeof ProjectsNewRoute
   WorkspacesWorkspaceIdRoute: typeof WorkspacesWorkspaceIdRoute
   CodersIndexRoute: typeof CodersIndexRoute
 }
@@ -181,6 +194,13 @@ declare module '@tanstack/react-router' {
       path: '/workspaces/$workspaceId'
       fullPath: '/workspaces/$workspaceId'
       preLoaderRoute: typeof WorkspacesWorkspaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/projects/new': {
+      id: '/projects/new'
+      path: '/projects/new'
+      fullPath: '/projects/new'
+      preLoaderRoute: typeof ProjectsNewRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/onboarding/coder': {
@@ -233,6 +253,7 @@ const rootRouteChildren: RootRouteChildren = {
   CodersCoderIdRoute: CodersCoderIdRouteWithChildren,
   EarningsCoderIdRoute: EarningsCoderIdRoute,
   OnboardingCoderRoute: OnboardingCoderRoute,
+  ProjectsNewRoute: ProjectsNewRoute,
   WorkspacesWorkspaceIdRoute: WorkspacesWorkspaceIdRoute,
   CodersIndexRoute: CodersIndexRoute,
 }
