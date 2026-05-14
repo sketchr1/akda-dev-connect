@@ -95,8 +95,8 @@ function PostProjectPage() {
         .insert({ project_id: project.id, status: "pending" });
       if (eErr) throw eErr;
 
-      toast.success("Project posted — coders can now find it.");
-      navigate({ to: "/coders" });
+      toast.success("Project posted — fund escrow to activate.");
+      navigate({ to: "/projects/$projectId/pay", params: { projectId: project.id } });
     } catch (err) {
       const msg = err instanceof Error ? err.message : "Something went wrong";
       toast.error(msg);
