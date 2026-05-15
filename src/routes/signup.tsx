@@ -11,6 +11,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/signup")({
   component: SignUpPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    role: search.role === "coder" || search.role === "customer" ? (search.role as Role) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign up · Akda" },
