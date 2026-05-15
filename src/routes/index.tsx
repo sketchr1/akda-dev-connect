@@ -20,6 +20,25 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const featured = coders.slice(0, 3);
+  const navigate = useNavigate();
+  const { user, role, hasCoderProfile, loading } = useProfile();
+
+  function handleCoderJoin() {
+    if (loading) return;
+    if (!user) {
+      navigate({ to: "/signup", search: { role: "coder" } as never });
+      return;
+    }
+    if (role === "coder") {
+      if (hasCoderProfile) {
+        navigate({ to: "/coders/$coderId", params: { coderId: user.id } });
+      } else {
+        navigate({ to: "/onboarding/coder" });
+      }
+    } else {
+      navigate({ to: "/signup", search: { role: "coder" } as never });
+    }
+  }
   return (
     <div className="min-h-screen">
       <SiteHeader />
