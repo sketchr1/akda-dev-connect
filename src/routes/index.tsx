@@ -63,7 +63,7 @@ function Home() {
               <Link to="/coders" className="group inline-flex items-center gap-2 rounded-xl bg-gradient-akda px-6 py-3 font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]">
                 Browse coders <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-6 py-3 font-medium text-foreground backdrop-blur transition-colors hover:bg-surface-elevated">
+              <button onClick={handleCoderJoin} className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-6 py-3 font-medium text-foreground backdrop-blur transition-colors hover:bg-surface-elevated">
                 I'm a coder · join
               </button>
             </div>
