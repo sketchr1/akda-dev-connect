@@ -25,6 +25,7 @@ export type Database = {
           location: string | null
           portfolio_urls: string[]
           profile_id: string
+          stripe_account_id: string | null
           updated_at: string
         }
         Insert: {
@@ -37,6 +38,7 @@ export type Database = {
           location?: string | null
           portfolio_urls?: string[]
           profile_id: string
+          stripe_account_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -49,6 +51,7 @@ export type Database = {
           location?: string | null
           portfolio_urls?: string[]
           profile_id?: string
+          stripe_account_id?: string | null
           updated_at?: string
         }
         Relationships: [
@@ -126,6 +129,7 @@ export type Database = {
       projects: {
         Row: {
           budget_usd: number
+          coder_id: string | null
           created_at: string
           customer_id: string
           deadline: string
@@ -138,6 +142,7 @@ export type Database = {
         }
         Insert: {
           budget_usd: number
+          coder_id?: string | null
           created_at?: string
           customer_id: string
           deadline: string
@@ -150,6 +155,7 @@ export type Database = {
         }
         Update: {
           budget_usd?: number
+          coder_id?: string | null
           created_at?: string
           customer_id?: string
           deadline?: string
