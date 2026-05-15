@@ -75,6 +75,18 @@ function SignUpPage() {
     }
     toast.success("Account created. Check your email to confirm.");
     if (selectedRole === "coder") {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: existing } = await supabase
+          .from("coder_profiles")
+          .select("profile_id")
+          .eq("profile_id", authUser.id)
+          .maybeSingle();
+        if (existing) {
+          navigate({ to: "/coders/$coderId", params: { coderId: authUser.id } });
+          return;
+        }
+      }
       navigate({ to: "/onboarding/coder" });
     } else {
       navigate({ to: "/" });
