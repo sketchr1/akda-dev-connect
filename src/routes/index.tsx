@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Code2, ShieldCheck, Sparkles } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CoderCard } from "@/components/CoderCard";
 import { coders } from "@/data/coders";
+import { useProfile } from "@/hooks/use-profile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
