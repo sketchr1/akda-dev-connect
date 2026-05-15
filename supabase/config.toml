@@ -5,3 +5,6 @@ verify_jwt = true
 
 [functions.confirm-escrow-funded]
 verify_jwt = true
+
+[functions.release-escrow]
+verify_jwt = true
