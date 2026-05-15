@@ -11,6 +11,9 @@ import { SiteHeader } from "@/components/SiteHeader";
 
 export const Route = createFileRoute("/signup")({
   component: SignUpPage,
+  validateSearch: (search: Record<string, unknown>) => ({
+    role: search.role === "coder" || search.role === "customer" ? (search.role as Role) : undefined,
+  }),
   head: () => ({
     meta: [
       { title: "Sign up · Akda" },
@@ -23,12 +26,13 @@ type Role = "coder" | "customer";
 
 function SignUpPage() {
   const navigate = useNavigate();
+  const search = Route.useSearch();
   const [step, setStep] = useState<1 | 2>(1);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [username, setUsername] = useState("");
   const [displayName, setDisplayName] = useState("");
-  const [role, setRole] = useState<Role | null>(null);
+  const [role, setRole] = useState<Role | null>(search.role ?? null);
   const [submitting, setSubmitting] = useState(false);
   const [googleLoading, setGoogleLoading] = useState(false);
 
@@ -71,6 +75,18 @@ function SignUpPage() {
     }
     toast.success("Account created. Check your email to confirm.");
     if (selectedRole === "coder") {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      if (authUser) {
+        const { data: existing } = await supabase
+          .from("coder_profiles")
+          .select("profile_id")
+          .eq("profile_id", authUser.id)
+          .maybeSingle();
+        if (existing) {
+          navigate({ to: "/coders/$coderId", params: { coderId: authUser.id } });
+          return;
+        }
+      }
       navigate({ to: "/onboarding/coder" });
     } else {
       navigate({ to: "/" });

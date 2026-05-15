@@ -1,9 +1,10 @@
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { ArrowRight, Code2, ShieldCheck, Sparkles } from "lucide-react";
 import heroBg from "@/assets/hero-bg.jpg";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CoderCard } from "@/components/CoderCard";
 import { coders } from "@/data/coders";
+import { useProfile } from "@/hooks/use-profile";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -19,6 +20,25 @@ export const Route = createFileRoute("/")({
 
 function Home() {
   const featured = coders.slice(0, 3);
+  const navigate = useNavigate();
+  const { user, role, hasCoderProfile, loading } = useProfile();
+
+  function handleCoderJoin() {
+    if (loading) return;
+    if (!user) {
+      navigate({ to: "/signup", search: { role: "coder" } as never });
+      return;
+    }
+    if (role === "coder") {
+      if (hasCoderProfile) {
+        navigate({ to: "/coders/$coderId", params: { coderId: user.id } });
+      } else {
+        navigate({ to: "/onboarding/coder" });
+      }
+    } else {
+      navigate({ to: "/signup", search: { role: "coder" } as never });
+    }
+  }
   return (
     <div className="min-h-screen">
       <SiteHeader />
@@ -43,7 +63,7 @@ function Home() {
               <Link to="/coders" className="group inline-flex items-center gap-2 rounded-xl bg-gradient-akda px-6 py-3 font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]">
                 Browse coders <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-0.5" />
               </Link>
-              <button className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-6 py-3 font-medium text-foreground backdrop-blur transition-colors hover:bg-surface-elevated">
+              <button onClick={handleCoderJoin} className="inline-flex items-center gap-2 rounded-xl border border-border bg-surface/60 px-6 py-3 font-medium text-foreground backdrop-blur transition-colors hover:bg-surface-elevated">
                 I'm a coder · join
               </button>
             </div>
