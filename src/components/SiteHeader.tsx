@@ -2,6 +2,7 @@ import { Link } from "@tanstack/react-router";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import akdaLogo from "@/assets/akda-logo.png";
 
 export function SiteHeader() {
   const { user, loading } = useAuth();
@@ -10,11 +11,8 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/70 backdrop-blur-xl">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6">
         <Link to="/" className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-akda shadow-glow">
-            <span className="font-mono text-sm font-bold text-primary-foreground">A</span>
-          </div>
-          <span className="text-lg font-semibold tracking-tight">Akda</span>
-          <span className="ml-1 rounded-md border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">beta</span>
+          <img src={akdaLogo} alt="Akda" className="h-9 w-auto object-contain dark:brightness-0 dark:invert" />
+          <span className="rounded-md border border-border bg-surface px-1.5 py-0.5 font-mono text-[10px] uppercase tracking-wider text-muted-foreground">beta</span>
         </Link>
         <nav className="hidden items-center gap-8 text-sm text-muted-foreground md:flex">
           <Link to="/" className="transition-colors hover:text-foreground" activeOptions={{ exact: true }} activeProps={{ className: "text-foreground" }}>Home</Link>
