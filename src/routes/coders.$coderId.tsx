@@ -1,13 +1,80 @@
-import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
+import { supabase } from "@/integrations/supabase/client";
+
+function initialsOf(name: string) {
+  return name
+    .split(/\s+/)
+    .filter(Boolean)
+    .slice(0, 2)
+    .map((p) => p[0]?.toUpperCase() ?? "")
+    .join("") || "??";
+}
+
+async function loadCoderFromDb(usernameOrId: string): Promise<Coder | null> {
+  // Try by username first, then by id (uuid)
+  const { data: byUsername } = await supabase
+    .from("profiles")
+    .select("id, username, display_name, role")
+    .eq("username", usernameOrId)
+    .maybeSingle();
+
+  let profile = byUsername;
+  if (!profile) {
+    const { data: byId } = await supabase
+      .from("profiles")
+      .select("id, username, display_name, role")
+      .eq("id", usernameOrId)
+      .maybeSingle();
+    profile = byId;
+  }
+  if (!profile || profile.role !== "coder") return null;
+
+  const { data: cp } = await supabase
+    .from("coder_profiles")
+    .select("*")
+    .eq("profile_id", profile.id)
+    .maybeSingle();
+
+  if (!cp) {
+    // Coder exists but onboarding incomplete
+    throw redirect({ to: "/onboarding/coder" });
+  }
+
+  const name = profile.display_name || profile.username || "Coder";
+  return {
+    id: profile.username || profile.id,
+    name,
+    handle: `@${profile.username ?? ""}`,
+    title: cp.headline ?? "",
+    bio: cp.bio ?? "",
+    homeLanguage: cp.home_language ?? "",
+    fluency: cp.fluency ?? [],
+    status: "open",
+    commendations: 0,
+    hourlyRate: Number(cp.hourly_rate_usd ?? 0),
+    yearsExperience: 0,
+    location: cp.location ?? "",
+    initials: initialsOf(name),
+    accent: "from-blue-500 to-cyan-400",
+    portfolio: (cp.portfolio_urls ?? []).map((url: string) => ({
+      title: url.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+      description: url,
+      image: "",
+      client: "",
+    })),
+  };
+}
 
 export const Route = createFileRoute("/coders/$coderId")({
-  loader: ({ params }): { coder: Coder } => {
-    const coder = getCoder(params.coderId);
-    if (!coder) throw notFound();
-    return { coder };
+  loader: async ({ params }): Promise<{ coder: Coder }> => {
+    const mock = getCoder(params.coderId);
+    if (mock) return { coder: mock };
+    const dbCoder = await loadCoderFromDb(params.coderId);
+    if (!dbCoder) throw notFound();
+    return { coder: dbCoder };
   },
   head: ({ loaderData }) => ({
     meta: loaderData
