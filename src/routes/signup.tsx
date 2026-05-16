@@ -77,13 +77,12 @@ function SignUpPage() {
     if (selectedRole === "coder") {
       const { data: { user: authUser } } = await supabase.auth.getUser();
       if (authUser) {
-        const { data: existing } = await supabase
-          .from("coder_profiles")
-          .select("profile_id")
-          .eq("profile_id", authUser.id)
-          .maybeSingle();
-        if (existing) {
-          navigate({ to: "/coders/$coderId", params: { coderId: authUser.id } });
+        const [{ data: existing }, { data: prof }] = await Promise.all([
+          supabase.from("coder_profiles").select("profile_id").eq("profile_id", authUser.id).maybeSingle(),
+          supabase.from("profiles").select("username").eq("id", authUser.id).maybeSingle(),
+        ]);
+        if (existing && prof?.username) {
+          navigate({ to: "/coders/$coderId", params: { coderId: prof.username } });
           return;
         }
       }

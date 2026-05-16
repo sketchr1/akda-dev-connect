@@ -129,7 +129,7 @@ function CoderOnboarding() {
     if (cErr) return toast.error(cErr.message);
 
     toast.success("Profile published");
-    navigate({ to: "/coders/$coderId", params: { coderId: user.id } });
+    navigate({ to: "/coders/$coderId", params: { coderId: username } });
   }
 
   const progress = useMemo(() => (step / 3) * 100, [step]);

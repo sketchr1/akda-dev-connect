@@ -5,7 +5,7 @@ import { useProfile } from "@/hooks/use-profile";
 import akdaLogo from "@/assets/akda-logo.png";
 
 export function SiteHeader() {
-  const { user, role, loading } = useProfile();
+  const { user, role, username, hasCoderProfile, loading } = useProfile();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/70 backdrop-blur-xl">
@@ -24,8 +24,8 @@ export function SiteHeader() {
             <>
               {role === "coder" ? (
                 <Link
-                  to="/coders/$coderId"
-                  params={{ coderId: user.id }}
+                  to={hasCoderProfile && username ? "/coders/$coderId" : "/onboarding/coder"}
+                  params={hasCoderProfile && username ? { coderId: username } : undefined as never}
                   className="hidden rounded-lg border border-primary/40 bg-primary/10 px-3 py-2 text-sm font-medium text-primary transition-colors hover:bg-primary/20 md:inline-flex"
                 >
                   My Profile
