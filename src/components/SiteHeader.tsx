@@ -5,7 +5,7 @@ import { useProfile } from "@/hooks/use-profile";
 import akdaLogo from "@/assets/akda-logo.png";
 
 export function SiteHeader() {
-  const { user, role, loading } = useProfile();
+  const { user, role, username, hasCoderProfile, loading } = useProfile();
 
   return (
     <header className="sticky top-0 z-40 border-b border-border/50 bg-background/70 backdrop-blur-xl">
