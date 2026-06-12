@@ -110,12 +110,19 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder } = Route.useLoaderData() as { coder: Coder };
+  const { coder, coderUserId } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null };
   const status = statusConfig[coder.status];
+  const [briefOpen, setBriefOpen] = useState(false);
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
+      <SendBriefDialog
+        open={briefOpen}
+        onOpenChange={setBriefOpen}
+        coderUserId={coderUserId}
+        coderName={coder.name}
+      />
 
       <div className="mx-auto max-w-5xl px-6 py-10">
         <Link to="/coders" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -141,7 +148,12 @@ function CoderProfile() {
               </div>
             </div>
             <div className="flex flex-col gap-2 md:items-end">
-              <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-akda px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]">
+              <button
+                onClick={() => setBriefOpen(true)}
+                disabled={!coderUserId}
+                title={!coderUserId ? "Demo profile — try a real coder" : undefined}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-akda px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              >
                 <MessageSquare className="h-4 w-4" /> Send a brief
               </button>
               <p className="font-mono text-xs text-muted-foreground">${coder.hourlyRate}/hr · responds in ~3h</p>
