@@ -1,9 +1,30 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Search } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
 import { CoderCard } from "@/components/CoderCard";
-import { coders, type CoderStatus, statusConfig } from "@/data/coders";
+import { coders as placeholderCoders, type Coder, type CoderStatus, statusConfig } from "@/data/coders";
+import { supabase } from "@/integrations/supabase/client";
+
+const accents = [
+  "from-blue-500 to-cyan-400",
+  "from-indigo-500 to-blue-500",
+  "from-violet-500 to-fuchsia-500",
+  "from-emerald-500 to-teal-400",
+  "from-amber-500 to-orange-500",
+  "from-sky-500 to-blue-600",
+];
+
+function initialsOf(name: string) {
+  return (
+    name
+      .split(/\s+/)
+      .filter(Boolean)
+      .slice(0, 2)
+      .map((p) => p[0]?.toUpperCase() ?? "")
+      .join("") || "??"
+  );
+}
 
 export const Route = createFileRoute("/coders/")({
   head: () => ({
