@@ -258,7 +258,15 @@ function WorkspacePage() {
   }
 
   if (notFoundState || !workspace) {
-    throw notFound();
+    return (
+      <div className="min-h-screen">
+        <SiteHeader />
+        <div className="mx-auto max-w-2xl px-6 py-32 text-center">
+          <h1 className="text-3xl font-semibold">Workspace not found</h1>
+          <Link to="/" className="mt-6 inline-block text-akda hover:underline">Back home</Link>
+        </div>
+      </div>
+    );
   }
 
   const customerName = workspace.customer?.display_name || workspace.customer?.username || "Customer";
