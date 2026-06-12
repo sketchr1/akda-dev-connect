@@ -38,12 +38,55 @@ export const Route = createFileRoute("/coders/")({
   component: BrowseCoders,
 });
 
-const allTags = Array.from(new Set(coders.flatMap((c) => c.fluency))).sort();
-
 function BrowseCoders() {
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<CoderStatus | "all">("all");
   const [tagFilter, setTagFilter] = useState<string | null>(null);
+  const [coders, setCoders] = useState<Coder[]>(placeholderCoders);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      const { data: rows } = await supabase
+        .from("coder_profiles")
+        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, profiles!inner(username, display_name, role)")
+        .eq("profiles.role", "coder");
+      if (cancelled) return;
+      const real: Coder[] = (rows ?? []).map((r: any, i: number) => {
+        const p = r.profiles;
+        const name = p?.display_name || p?.username || "Coder";
+        return {
+          id: p?.username || r.profile_id,
+          name,
+          handle: p?.username ? `@${p.username}` : "",
+          title: r.headline ?? "",
+          bio: r.bio ?? "",
+          homeLanguage: r.home_language ?? "",
+          fluency: r.fluency ?? [],
+          status: "open" as CoderStatus,
+          commendations: 0,
+          hourlyRate: Number(r.hourly_rate_usd ?? 0),
+          yearsExperience: 0,
+          location: r.location ?? "",
+          initials: initialsOf(name),
+          accent: accents[i % accents.length],
+          portfolio: [],
+        };
+      });
+      setCoders(real.length > 0 ? real : placeholderCoders);
+      setLoading(false);
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  const allTags = useMemo(
+    () => Array.from(new Set(coders.flatMap((c) => c.fluency))).sort(),
+    [coders],
+  );
 
   const filtered = useMemo(() => {
     return coders.filter((c) => {
@@ -60,7 +103,7 @@ function BrowseCoders() {
       }
       return true;
     });
-  }, [query, statusFilter, tagFilter]);
+  }, [coders, query, statusFilter, tagFilter]);
 
   return (
     <div className="min-h-screen">
@@ -69,7 +112,7 @@ function BrowseCoders() {
         <div className="flex flex-col gap-2">
           <p className="font-mono text-xs uppercase tracking-wider text-akda">Directory</p>
           <h1 className="text-4xl font-semibold tracking-tight md:text-5xl">Find your coder.</h1>
-          <p className="max-w-xl text-muted-foreground">{coders.length} verified developers. Filter by fluency, availability, or home language.</p>
+          <p className="max-w-xl text-muted-foreground">{loading ? "Loading…" : `${coders.length} verified developers.`} Filter by fluency, availability, or home language.</p>
         </div>
 
         {/* Search */}
