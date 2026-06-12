@@ -66,6 +66,7 @@ export type Database = {
       }
       escrow: {
         Row: {
+          amount_usd: number
           created_at: string
           id: string
           payment_intent_id: string | null
@@ -74,6 +75,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          amount_usd?: number
           created_at?: string
           id?: string
           payment_intent_id?: string | null
@@ -82,6 +84,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          amount_usd?: number
           created_at?: string
           id?: string
           payment_intent_id?: string | null
@@ -95,6 +98,41 @@ export type Database = {
             columns: ["project_id"]
             isOneToOne: true
             referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      messages: {
+        Row: {
+          body: string
+          created_at: string
+          id: string
+          is_system: boolean
+          sender_id: string | null
+          workspace_id: string
+        }
+        Insert: {
+          body: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          sender_id?: string | null
+          workspace_id: string
+        }
+        Update: {
+          body?: string
+          created_at?: string
+          id?: string
+          is_system?: boolean
+          sender_id?: string | null
+          workspace_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "messages_workspace_id_fkey"
+            columns: ["workspace_id"]
+            isOneToOne: false
+            referencedRelation: "workspaces"
             referencedColumns: ["id"]
           },
         ]
@@ -196,6 +234,41 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      workspaces: {
+        Row: {
+          coder_id: string
+          created_at: string
+          customer_id: string
+          id: string
+          project_id: string
+          updated_at: string
+        }
+        Insert: {
+          coder_id: string
+          created_at?: string
+          customer_id: string
+          id?: string
+          project_id: string
+          updated_at?: string
+        }
+        Update: {
+          coder_id?: string
+          created_at?: string
+          customer_id?: string
+          id?: string
+          project_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "workspaces_project_id_fkey"
+            columns: ["project_id"]
+            isOneToOne: false
+            referencedRelation: "projects"
+            referencedColumns: ["id"]
+          },
+        ]
       }
     }
     Views: {

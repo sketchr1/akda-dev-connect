@@ -1,6 +1,8 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
+import { useState } from "react";
 import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings } from "lucide-react";
 import { SiteHeader } from "@/components/SiteHeader";
+import { SendBriefDialog } from "@/components/SendBriefDialog";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
 import { supabase } from "@/integrations/supabase/client";
 
@@ -13,8 +15,7 @@ function initialsOf(name: string) {
     .join("") || "??";
 }
 
-async function loadCoderFromDb(usernameOrId: string): Promise<Coder | null> {
-  // Try by username first, then by id (uuid)
+async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string } | null> {
   const { data: byUsername } = await supabase
     .from("profiles")
     .select("id, username, display_name, role")
@@ -39,42 +40,44 @@ async function loadCoderFromDb(usernameOrId: string): Promise<Coder | null> {
     .maybeSingle();
 
   if (!cp) {
-    // Coder exists but onboarding incomplete
     throw redirect({ to: "/onboarding/coder" });
   }
 
   const name = profile.display_name || profile.username || "Coder";
   return {
-    id: profile.username || profile.id,
-    name,
-    handle: `@${profile.username ?? ""}`,
-    title: cp.headline ?? "",
-    bio: cp.bio ?? "",
-    homeLanguage: cp.home_language ?? "",
-    fluency: cp.fluency ?? [],
-    status: "open",
-    commendations: 0,
-    hourlyRate: Number(cp.hourly_rate_usd ?? 0),
-    yearsExperience: 0,
-    location: cp.location ?? "",
-    initials: initialsOf(name),
-    accent: "from-blue-500 to-cyan-400",
-    portfolio: (cp.portfolio_urls ?? []).map((url: string) => ({
-      title: url.replace(/^https?:\/\//, "").replace(/\/$/, ""),
-      description: url,
-      image: "",
-      client: "",
-    })),
+    coderUserId: profile.id,
+    coder: {
+      id: profile.username || profile.id,
+      name,
+      handle: `@${profile.username ?? ""}`,
+      title: cp.headline ?? "",
+      bio: cp.bio ?? "",
+      homeLanguage: cp.home_language ?? "",
+      fluency: cp.fluency ?? [],
+      status: "open",
+      commendations: 0,
+      hourlyRate: Number(cp.hourly_rate_usd ?? 0),
+      yearsExperience: 0,
+      location: cp.location ?? "",
+      initials: initialsOf(name),
+      accent: "from-blue-500 to-cyan-400",
+      portfolio: (cp.portfolio_urls ?? []).map((url: string) => ({
+        title: url.replace(/^https?:\/\//, "").replace(/\/$/, ""),
+        description: url,
+        image: "",
+        client: "",
+      })),
+    },
   };
 }
 
 export const Route = createFileRoute("/coders/$coderId")({
-  loader: async ({ params }): Promise<{ coder: Coder }> => {
+  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null }> => {
     const mock = getCoder(params.coderId);
-    if (mock) return { coder: mock };
+    if (mock) return { coder: mock, coderUserId: null };
     const dbCoder = await loadCoderFromDb(params.coderId);
     if (!dbCoder) throw notFound();
-    return { coder: dbCoder };
+    return dbCoder;
   },
   head: ({ loaderData }) => ({
     meta: loaderData
@@ -107,12 +110,19 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder } = Route.useLoaderData() as { coder: Coder };
+  const { coder, coderUserId } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null };
   const status = statusConfig[coder.status];
+  const [briefOpen, setBriefOpen] = useState(false);
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
+      <SendBriefDialog
+        open={briefOpen}
+        onOpenChange={setBriefOpen}
+        coderUserId={coderUserId}
+        coderName={coder.name}
+      />
 
       <div className="mx-auto max-w-5xl px-6 py-10">
         <Link to="/coders" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
@@ -138,7 +148,12 @@ function CoderProfile() {
               </div>
             </div>
             <div className="flex flex-col gap-2 md:items-end">
-              <button className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-akda px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]">
+              <button
+                onClick={() => setBriefOpen(true)}
+                disabled={!coderUserId}
+                title={!coderUserId ? "Demo profile — try a real coder" : undefined}
+                className="inline-flex items-center justify-center gap-2 rounded-xl bg-gradient-akda px-5 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:scale-100"
+              >
                 <MessageSquare className="h-4 w-4" /> Send a brief
               </button>
               <p className="font-mono text-xs text-muted-foreground">${coder.hourlyRate}/hr · responds in ~3h</p>
