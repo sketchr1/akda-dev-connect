@@ -111,41 +111,46 @@ function WorkspacePage() {
     let cancelled = false;
     async function load() {
       setLoading(true);
-      const { data, error } = await supabase
+      const { data: ws, error: wsErr } = await supabase
         .from("workspaces")
-        .select(
-          "id, customer_id, coder_id, project:projects!inner(title, description, budget_usd, deadline), customer:profiles!workspaces_customer_id_fkey(display_name, username), coder:profiles!workspaces_coder_id_fkey(display_name, username)"
-        )
+        .select("id, customer_id, coder_id, project_id")
         .eq("id", workspaceId)
         .maybeSingle();
 
       if (cancelled) return;
-      if (error || !data) {
+      if (wsErr || !ws) {
         setNotFoundState(true);
         setLoading(false);
         return;
       }
 
-      const { data: escrowRow } = await supabase
-        .from("escrow")
-        .select("status, amount_usd")
-        .eq("project_id", (data as any).project ? (data as any).project_id ?? null : null)
-        .maybeSingle();
+      const [{ data: project }, { data: escrow }, { data: customer }, { data: coder }] = await Promise.all([
+        supabase.from("projects").select("title, description, budget_usd, deadline").eq("id", ws.project_id).maybeSingle(),
+        supabase.from("escrow").select("status, amount_usd").eq("project_id", ws.project_id).maybeSingle(),
+        supabase.from("profiles").select("display_name, username").eq("id", ws.customer_id).maybeSingle(),
+        supabase.from("profiles").select("display_name, username").eq("id", ws.coder_id).maybeSingle(),
+      ]);
 
-      // The select above used the embedded project but we need project_id separately for escrow
-      const { data: ws2 } = await supabase
-        .from("workspaces")
-        .select("project_id")
-        .eq("id", workspaceId)
-        .maybeSingle();
-      const projectId = ws2?.project_id;
-      const { data: escrow } = projectId
-        ? await supabase.from("escrow").select("status, amount_usd").eq("project_id", projectId).maybeSingle()
-        : { data: null };
+      if (cancelled) return;
+      if (!project) {
+        setNotFoundState(true);
+        setLoading(false);
+        return;
+      }
 
       setWorkspace({
-        ...(data as any),
-        escrow: escrow ?? escrowRow ?? null,
+        id: ws.id,
+        customer_id: ws.customer_id,
+        coder_id: ws.coder_id,
+        project: {
+          title: project.title,
+          description: project.description,
+          budget_usd: Number(project.budget_usd),
+          deadline: project.deadline,
+        },
+        escrow: escrow ? { status: escrow.status as EscrowStatus, amount_usd: Number(escrow.amount_usd) } : null,
+        customer: customer ?? { display_name: null, username: null },
+        coder: coder ?? { display_name: null, username: null },
       });
 
       const { data: msgs } = await supabase
@@ -153,6 +158,7 @@ function WorkspacePage() {
         .select("id, sender_id, body, is_system, created_at")
         .eq("workspace_id", workspaceId)
         .order("created_at", { ascending: true });
+      if (cancelled) return;
       setMessages((msgs as ChatMessage[]) ?? []);
       setLoading(false);
     }
