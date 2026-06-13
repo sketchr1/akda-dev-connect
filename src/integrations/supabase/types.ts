@@ -16,7 +16,9 @@ export type Database = {
     Tables: {
       coder_profiles: {
         Row: {
+          availability: Database["public"]["Enums"]["coder_availability"]
           bio: string | null
+          commendation_count: number
           created_at: string
           fluency: string[]
           headline: string | null
@@ -28,7 +30,9 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          availability?: Database["public"]["Enums"]["coder_availability"]
           bio?: string | null
+          commendation_count?: number
           created_at?: string
           fluency?: string[]
           headline?: string | null
@@ -40,7 +44,9 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          availability?: Database["public"]["Enums"]["coder_availability"]
           bio?: string | null
+          commendation_count?: number
           created_at?: string
           fluency?: string[]
           headline?: string | null
@@ -282,6 +288,7 @@ export type Database = {
     }
     Enums: {
       app_role: "coder" | "customer"
+      coder_availability: "open" | "working" | "busy"
       escrow_status: "pending" | "funded" | "released" | "refunded"
       project_status:
         | "open"
@@ -417,6 +424,7 @@ export const Constants = {
   public: {
     Enums: {
       app_role: ["coder", "customer"],
+      coder_availability: ["open", "working", "busy"],
       escrow_status: ["pending", "funded", "released", "refunded"],
       project_status: [
         "open",
