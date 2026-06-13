@@ -50,7 +50,7 @@ function BrowseCoders() {
     async function load() {
       const { data: rows } = await supabase
         .from("coder_profiles")
-        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, profiles!inner(username, display_name, role)")
+        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, availability, commendation_count, profiles!inner(username, display_name, role)")
         .eq("profiles.role", "coder");
       if (cancelled) return;
       const real: Coder[] = (rows ?? []).map((r: any, i: number) => {
@@ -64,8 +64,8 @@ function BrowseCoders() {
           bio: r.bio ?? "",
           homeLanguage: r.home_language ?? "",
           fluency: r.fluency ?? [],
-          status: "open" as CoderStatus,
-          commendations: 0,
+          status: (r.availability ?? "open") as CoderStatus,
+          commendations: Number(r.commendation_count ?? 0),
           hourlyRate: Number(r.hourly_rate_usd ?? 0),
           yearsExperience: 0,
           location: r.location ?? "",
