@@ -143,6 +143,7 @@ function WorkspacePage() {
         id: ws.id,
         customer_id: ws.customer_id,
         coder_id: ws.coder_id,
+        project_id: ws.project_id,
         project: {
           title: project.title,
           description: project.description,
