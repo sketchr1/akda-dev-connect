@@ -113,7 +113,7 @@ function PayPage() {
   );
 }
 
-function CheckoutForm({ projectId }: { projectId: string }) {
+function CheckoutForm({ projectId, returnTo }: { projectId: string; returnTo?: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
