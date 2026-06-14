@@ -14,6 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/projects/$projectId/pay")({
   head: () => ({ meta: [{ title: "Fund escrow · Akda" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    return_to: typeof s.return_to === "string" ? s.return_to : undefined,
+  }),
   component: PayPage,
 });
 
