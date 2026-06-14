@@ -26,6 +26,7 @@ interface DbWorkspace {
   id: string;
   customer_id: string;
   coder_id: string;
+  project_id: string;
   project: {
     title: string;
     description: string;
