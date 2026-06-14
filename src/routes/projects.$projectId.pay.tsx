@@ -145,7 +145,11 @@ function CheckoutForm({ projectId, returnTo }: { projectId: string; returnTo?: s
         return;
       }
       toast.success("Escrow funded", { description: "Project is now active." });
-      navigate({ to: "/" });
+      if (returnTo) {
+        window.location.href = returnTo;
+      } else {
+        navigate({ to: "/" });
+      }
     } else {
       toast(`Payment ${paymentIntent?.status ?? "pending"}`);
       setSubmitting(false);
