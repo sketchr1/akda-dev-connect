@@ -14,6 +14,9 @@ import { supabase } from "@/integrations/supabase/client";
 
 export const Route = createFileRoute("/projects/$projectId/pay")({
   head: () => ({ meta: [{ title: "Fund escrow · Akda" }] }),
+  validateSearch: (s: Record<string, unknown>) => ({
+    return_to: typeof s.return_to === "string" ? s.return_to : undefined,
+  }),
   component: PayPage,
 });
 
@@ -25,6 +28,7 @@ type IntentResponse = {
 
 function PayPage() {
   const { projectId } = Route.useParams();
+  const { return_to } = Route.useSearch();
   const [intent, setIntent] = useState<IntentResponse | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -95,7 +99,7 @@ function PayPage() {
                 <span className="text-xl font-semibold">${(intent.amount / 100).toLocaleString()}</span>
               </div>
               <Elements stripe={stripePromise} options={options}>
-                <CheckoutForm projectId={projectId} />
+                <CheckoutForm projectId={projectId} returnTo={return_to} />
               </Elements>
               <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                 <ShieldCheck className="h-3.5 w-3.5 text-akda" />
@@ -109,7 +113,7 @@ function PayPage() {
   );
 }
 
-function CheckoutForm({ projectId }: { projectId: string }) {
+function CheckoutForm({ projectId, returnTo }: { projectId: string; returnTo?: string }) {
   const stripe = useStripe();
   const elements = useElements();
   const navigate = useNavigate();
@@ -141,7 +145,11 @@ function CheckoutForm({ projectId }: { projectId: string }) {
         return;
       }
       toast.success("Escrow funded", { description: "Project is now active." });
-      navigate({ to: "/" });
+      if (returnTo) {
+        window.location.href = returnTo;
+      } else {
+        navigate({ to: "/" });
+      }
     } else {
       toast(`Payment ${paymentIntent?.status ?? "pending"}`);
       setSubmitting(false);
