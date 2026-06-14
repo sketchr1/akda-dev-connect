@@ -188,27 +188,31 @@ function WorkspacePage() {
   const handleReleasePayment = async () => {
     if (!workspace) return;
     setReleasing(true);
-    const { data: ws } = await supabase.from("workspaces").select("project_id").eq("id", workspace.id).maybeSingle();
-    if (!ws) {
+    const { data: result, error } = await supabase.functions.invoke<{
+      ok?: boolean;
+      error?: string;
+      amount_to_coder_cents?: number;
+      platform_fee_cents?: number;
+      prompt_commendation?: boolean;
+    }>("release-escrow", { body: { project_id: workspace.project_id } });
+
+    if (error || !result?.ok) {
+      toast.error("Could not release payment", { description: result?.error ?? error?.message });
       setReleasing(false);
       return;
     }
-    const { error } = await supabase
-      .from("escrow")
-      .update({ status: "released" })
-      .eq("project_id", ws.project_id);
-    if (error) {
-      toast.error("Could not release payment", { description: error.message });
-      setReleasing(false);
-      return;
-    }
+
+    const totalAmount = workspace.escrow?.amount_usd ?? workspace.project.budget_usd;
+    const coderAmount = (result.amount_to_coder_cents ?? Math.floor(totalAmount * 0.9 * 100)) / 100;
+    const feeAmount = (result.platform_fee_cents ?? Math.round(totalAmount * 100 - coderAmount * 100)) / 100;
+
     await supabase.from("messages").insert({
       workspace_id: workspace.id,
       sender_id: null,
       is_system: true,
-      body: `Payment of $${(workspace.escrow?.amount_usd ?? workspace.project.budget_usd).toLocaleString()} released.`,
+      body: `Payment released — $${coderAmount.toLocaleString()} to coder, $${feeAmount.toLocaleString()} Akda fee (10%).`,
     });
-    setWorkspace({ ...workspace, escrow: { status: "released", amount_usd: workspace.escrow?.amount_usd ?? workspace.project.budget_usd } });
+    setWorkspace({ ...workspace, escrow: { status: "released", amount_usd: totalAmount } });
     const { data: msgs } = await supabase
       .from("messages")
       .select("id, sender_id, body, is_system, created_at")
@@ -216,10 +220,13 @@ function WorkspacePage() {
       .order("created_at", { ascending: true });
     setMessages((msgs as ChatMessage[]) ?? []);
     fireConfetti();
-    toast.success("Payment released");
+    toast.success("Payment released", { description: `$${coderAmount.toLocaleString()} sent to coder.` });
     setReleasing(false);
-    setTimeout(() => setCommendOpen(true), 600);
+    if (result.prompt_commendation !== false) {
+      setTimeout(() => setCommendOpen(true), 600);
+    }
   };
+
 
   const handleSend = async () => {
     if (!workspace || !user) return;
