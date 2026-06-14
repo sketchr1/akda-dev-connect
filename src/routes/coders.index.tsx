@@ -74,7 +74,7 @@ function BrowseCoders() {
           portfolio: [],
         };
       });
-      setCoders(real.length > 0 ? real : placeholderCoders);
+      setCoders(real.length >= 10 ? real : [...real, ...placeholderCoders]);
       setLoading(false);
     }
     load();
