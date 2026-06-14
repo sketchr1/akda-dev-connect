@@ -99,7 +99,7 @@ function PayPage() {
                 <span className="text-xl font-semibold">${(intent.amount / 100).toLocaleString()}</span>
               </div>
               <Elements stripe={stripePromise} options={options}>
-                <CheckoutForm projectId={projectId} />
+                <CheckoutForm projectId={projectId} returnTo={return_to} />
               </Elements>
               <p className="mt-4 inline-flex items-center gap-1.5 text-xs text-muted-foreground">
                 <ShieldCheck className="h-3.5 w-3.5 text-akda" />
