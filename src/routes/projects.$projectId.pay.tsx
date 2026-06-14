@@ -28,6 +28,7 @@ type IntentResponse = {
 
 function PayPage() {
   const { projectId } = Route.useParams();
+  const { return_to } = Route.useSearch();
   const [intent, setIntent] = useState<IntentResponse | null>(null);
   const [stripePromise, setStripePromise] = useState<Promise<Stripe | null> | null>(null);
   const [error, setError] = useState<string | null>(null);
