@@ -325,7 +325,17 @@ function WorkspacePage() {
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {isCustomer && !released && (
+            {isCustomer && workspace.escrow?.status === "pending" && (
+              <Link
+                to="/projects/$projectId/pay"
+                params={{ projectId: workspace.project_id }}
+                search={{ return_to: `/workspaces/${workspace.id}` }}
+                className="inline-flex items-center gap-2 rounded-xl bg-gradient-akda px-4 py-2.5 text-sm font-medium text-primary-foreground shadow-glow transition-transform hover:scale-[1.02]"
+              >
+                <ShieldCheck className="h-4 w-4" /> Fund Escrow
+              </Link>
+            )}
+            {isCustomer && !released && workspace.escrow?.status !== "pending" && (
               <button
                 onClick={handleReleasePayment}
                 disabled={workspace.escrow?.status !== "funded" || releasing}
