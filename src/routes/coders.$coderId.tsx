@@ -20,7 +20,7 @@ function initialsOf(name: string) {
 async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string; stripeConnected: boolean } | null> {
   const { data: byUsername } = await supabase
     .from("profiles")
-    .select("id, username, display_name, role")
+    .select("id, username, display_name")
     .eq("username", usernameOrId)
     .maybeSingle();
 
@@ -28,12 +28,12 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
   if (!profile) {
     const { data: byId } = await supabase
       .from("profiles")
-      .select("id, username, display_name, role")
+      .select("id, username, display_name")
       .eq("id", usernameOrId)
       .maybeSingle();
     profile = byId;
   }
-  if (!profile || profile.role !== "coder") return null;
+  if (!profile) return null;
 
   const { data: cp } = await supabase
     .from("coder_profiles")

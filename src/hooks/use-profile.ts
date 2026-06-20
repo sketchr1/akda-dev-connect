@@ -24,12 +24,15 @@ export function useProfile() {
         return;
       }
       setLoading(true);
-      const [{ data: profile }, { data: coderProfile }] = await Promise.all([
-        supabase.from("profiles").select("role, username, display_name").eq("id", user.id).maybeSingle(),
+      const [{ data: profile }, { data: coderProfile }, { data: roles }] = await Promise.all([
+        supabase.from("profiles").select("username, display_name").eq("id", user.id).maybeSingle(),
         supabase.from("coder_profiles").select("profile_id").eq("profile_id", user.id).maybeSingle(),
+        supabase.from("user_roles").select("role").eq("user_id", user.id),
       ]);
       if (cancelled) return;
-      setRole((profile?.role as Role | undefined) ?? null);
+      const roleValues = (roles ?? []).map((r) => r.role as Role);
+      const resolvedRole: Role | null = roleValues.includes("coder") ? "coder" : roleValues.includes("customer") ? "customer" : null;
+      setRole(resolvedRole);
       setUsername(profile?.username ?? null);
       setDisplayName(profile?.display_name ?? null);
       setHasCoderProfile(!!coderProfile);
