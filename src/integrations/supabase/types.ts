@@ -27,6 +27,7 @@ export type Database = {
           location: string | null
           portfolio_urls: string[]
           profile_id: string
+          stripe_account_id: string | null
           updated_at: string
         }
         Insert: {
@@ -41,6 +42,7 @@ export type Database = {
           location?: string | null
           portfolio_urls?: string[]
           profile_id: string
+          stripe_account_id?: string | null
           updated_at?: string
         }
         Update: {
@@ -55,6 +57,7 @@ export type Database = {
           location?: string | null
           portfolio_urls?: string[]
           profile_id?: string
+          stripe_account_id?: string | null
           updated_at?: string
         }
         Relationships: [

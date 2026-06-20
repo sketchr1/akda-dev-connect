@@ -1,10 +1,12 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings } from "lucide-react";
+import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings, CreditCard, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SendBriefDialog } from "@/components/SendBriefDialog";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 function initialsOf(name: string) {
   return name
@@ -15,7 +17,7 @@ function initialsOf(name: string) {
     .join("") || "??";
 }
 
-async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string } | null> {
+async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string; stripeConnected: boolean } | null> {
   const { data: byUsername } = await supabase
     .from("profiles")
     .select("id, username, display_name, role")
@@ -46,6 +48,7 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
   const name = profile.display_name || profile.username || "Coder";
   return {
     coderUserId: profile.id,
+    stripeConnected: Boolean(cp.stripe_account_id),
     coder: {
       id: profile.username || profile.id,
       name,
@@ -72,9 +75,9 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
 }
 
 export const Route = createFileRoute("/coders/$coderId")({
-  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null }> => {
+  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null; stripeConnected: boolean }> => {
     const mock = getCoder(params.coderId);
-    if (mock) return { coder: mock, coderUserId: null };
+    if (mock) return { coder: mock, coderUserId: null, stripeConnected: true };
     const dbCoder = await loadCoderFromDb(params.coderId);
     if (!dbCoder) throw notFound();
     return dbCoder;
@@ -110,13 +113,32 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder, coderUserId } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null };
+  const { coder, coderUserId, stripeConnected } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null; stripeConnected: boolean };
   const status = statusConfig[coder.status];
   const [briefOpen, setBriefOpen] = useState(false);
+  const { user } = useAuth();
+  const [connecting, setConnecting] = useState(false);
+  const isOwner = Boolean(coderUserId && user && user.id === coderUserId);
+  const showStripeBanner = isOwner && !stripeConnected;
+
+  const handleConnectStripe = async () => {
+    setConnecting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>("create-connect-account", {
+        body: { return_url: window.location.href },
+      });
+      if (error || !data?.url) throw new Error(data?.error || error?.message || "Failed to start onboarding");
+      window.location.href = data.url;
+    } catch (e) {
+      toast.error((e as Error).message);
+      setConnecting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
+
       <SendBriefDialog
         open={briefOpen}
         onOpenChange={setBriefOpen}
@@ -128,6 +150,29 @@ function CoderProfile() {
         <Link to="/coders" className="inline-flex items-center gap-1.5 text-sm text-muted-foreground transition-colors hover:text-foreground">
           <ArrowLeft className="h-4 w-4" /> All coders
         </Link>
+
+        {showStripeBanner && (
+          <button
+            onClick={handleConnectStripe}
+            disabled={connecting}
+            className="mt-6 flex w-full items-center justify-between gap-4 rounded-2xl border border-akda/40 bg-akda/10 px-5 py-4 text-left transition-colors hover:bg-akda/15 disabled:opacity-60"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-akda/20 text-akda">
+                <CreditCard className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Connect Stripe to receive payments.</p>
+                <p className="text-xs text-muted-foreground">Set up a Stripe Connect Express account to get paid for completed projects.</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-akda px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow">
+              {connecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+              {connecting ? "Redirecting…" : "Connect Stripe"}
+            </span>
+          </button>
+        )}
+
 
         {/* Header card */}
         <div className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card md:p-10">
