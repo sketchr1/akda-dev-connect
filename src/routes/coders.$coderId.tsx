@@ -151,6 +151,29 @@ function CoderProfile() {
           <ArrowLeft className="h-4 w-4" /> All coders
         </Link>
 
+        {showStripeBanner && (
+          <button
+            onClick={handleConnectStripe}
+            disabled={connecting}
+            className="mt-6 flex w-full items-center justify-between gap-4 rounded-2xl border border-akda/40 bg-akda/10 px-5 py-4 text-left transition-colors hover:bg-akda/15 disabled:opacity-60"
+          >
+            <div className="flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-akda/20 text-akda">
+                <CreditCard className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="text-sm font-semibold">Connect Stripe to receive payments.</p>
+                <p className="text-xs text-muted-foreground">Set up a Stripe Connect Express account to get paid for completed projects.</p>
+              </div>
+            </div>
+            <span className="inline-flex items-center gap-1.5 rounded-lg bg-gradient-akda px-3 py-2 text-xs font-medium text-primary-foreground shadow-glow">
+              {connecting ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : null}
+              {connecting ? "Redirecting…" : "Connect Stripe"}
+            </span>
+          </button>
+        )}
+
+
         {/* Header card */}
         <div className="relative mt-6 overflow-hidden rounded-3xl border border-border bg-card p-8 shadow-card md:p-10">
           <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-akda/20 blur-3xl" />
