@@ -17,7 +17,7 @@ function initialsOf(name: string) {
     .join("") || "??";
 }
 
-async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string } | null> {
+async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string; stripeConnected: boolean } | null> {
   const { data: byUsername } = await supabase
     .from("profiles")
     .select("id, username, display_name, role")
@@ -48,6 +48,7 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
   const name = profile.display_name || profile.username || "Coder";
   return {
     coderUserId: profile.id,
+    stripeConnected: Boolean(cp.stripe_account_id),
     coder: {
       id: profile.username || profile.id,
       name,
