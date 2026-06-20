@@ -113,13 +113,32 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder, coderUserId } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null };
+  const { coder, coderUserId, stripeConnected } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null; stripeConnected: boolean };
   const status = statusConfig[coder.status];
   const [briefOpen, setBriefOpen] = useState(false);
+  const { user } = useAuth();
+  const [connecting, setConnecting] = useState(false);
+  const isOwner = Boolean(coderUserId && user && user.id === coderUserId);
+  const showStripeBanner = isOwner && !stripeConnected;
+
+  const handleConnectStripe = async () => {
+    setConnecting(true);
+    try {
+      const { data, error } = await supabase.functions.invoke<{ url: string; error?: string }>("create-connect-account", {
+        body: { return_url: window.location.href },
+      });
+      if (error || !data?.url) throw new Error(data?.error || error?.message || "Failed to start onboarding");
+      window.location.href = data.url;
+    } catch (e) {
+      toast.error((e as Error).message);
+      setConnecting(false);
+    }
+  };
 
   return (
     <div className="min-h-screen">
       <SiteHeader />
+
       <SendBriefDialog
         open={briefOpen}
         onOpenChange={setBriefOpen}
