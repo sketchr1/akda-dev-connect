@@ -75,9 +75,9 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
 }
 
 export const Route = createFileRoute("/coders/$coderId")({
-  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null }> => {
+  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null; stripeConnected: boolean }> => {
     const mock = getCoder(params.coderId);
-    if (mock) return { coder: mock, coderUserId: null };
+    if (mock) return { coder: mock, coderUserId: null, stripeConnected: true };
     const dbCoder = await loadCoderFromDb(params.coderId);
     if (!dbCoder) throw notFound();
     return dbCoder;
