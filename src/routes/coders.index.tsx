@@ -48,10 +48,15 @@ function BrowseCoders() {
   useEffect(() => {
     let cancelled = false;
     async function load() {
-      const { data: rows } = await supabase
+      const { data: rows, error } = await supabase
         .from("coder_profiles")
         .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, availability, commendation_count, profiles!inner(username, display_name)");
       if (cancelled) return;
+      if (error) {
+        console.error("[coders directory] coder_profiles query failed:", error.message, error);
+      } else if (!rows || rows.length === 0) {
+        console.error("[coders directory] coder_profiles query returned no rows — check that coder_profiles rows exist and their profile_id references a profiles.id row (inner join drops orphans).");
+      }
       const real: Coder[] = (rows ?? []).map((r: any, i: number) => {
         const p = r.profiles;
         const name = p?.display_name || p?.username || "Coder";
