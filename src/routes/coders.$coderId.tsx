@@ -1,10 +1,12 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
 import { useState } from "react";
-import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings } from "lucide-react";
+import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings, CreditCard, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
 import { SendBriefDialog } from "@/components/SendBriefDialog";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
 import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/hooks/use-auth";
 
 function initialsOf(name: string) {
   return name
