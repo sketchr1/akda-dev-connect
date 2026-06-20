@@ -50,8 +50,7 @@ function BrowseCoders() {
     async function load() {
       const { data: rows } = await supabase
         .from("coder_profiles")
-        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, availability, commendation_count, profiles!inner(username, display_name, role)")
-        .eq("profiles.role", "coder");
+        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, availability, commendation_count, profiles!inner(username, display_name)");
       if (cancelled) return;
       const real: Coder[] = (rows ?? []).map((r: any, i: number) => {
         const p = r.profiles;
