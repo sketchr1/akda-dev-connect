@@ -112,13 +112,25 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder, coderUserId, stripeConnected } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null; stripeConnected: boolean };
+  const { coder, coderUserId } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null };
   const status = statusConfig[coder.status];
   const [briefOpen, setBriefOpen] = useState(false);
   const { user } = useAuth();
   const [connecting, setConnecting] = useState(false);
+  const [stripeConnected, setStripeConnected] = useState<boolean | null>(null);
   const isOwner = Boolean(coderUserId && user && user.id === coderUserId);
-  const showStripeBanner = isOwner && !stripeConnected;
+
+  useEffect(() => {
+    if (!isOwner) { setStripeConnected(null); return; }
+    let cancelled = false;
+    supabase.rpc("get_my_stripe_account_id").then(({ data }) => {
+      if (!cancelled) setStripeConnected(Boolean(data));
+    });
+    return () => { cancelled = true; };
+  }, [isOwner]);
+
+  const showStripeBanner = isOwner && stripeConnected === false;
+
 
   const handleConnectStripe = async () => {
     setConnecting(true);
