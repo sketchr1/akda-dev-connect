@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound, redirect } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { ArrowLeft, Award, BadgeCheck, CheckCircle2, Clock, MapPin, MessageSquare, Settings, CreditCard, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { SiteHeader } from "@/components/SiteHeader";
@@ -17,7 +17,7 @@ function initialsOf(name: string) {
     .join("") || "??";
 }
 
-async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string; stripeConnected: boolean } | null> {
+async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; coderUserId: string } | null> {
   const { data: byUsername } = await supabase
     .from("profiles")
     .select("id, username, display_name")
@@ -37,7 +37,7 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
 
   const { data: cp } = await supabase
     .from("coder_profiles")
-    .select("*")
+    .select("profile_id, location, home_language, headline, fluency, hourly_rate_usd, portfolio_urls, bio, availability, commendation_count")
     .eq("profile_id", profile.id)
     .maybeSingle();
 
@@ -48,7 +48,6 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
   const name = profile.display_name || profile.username || "Coder";
   return {
     coderUserId: profile.id,
-    stripeConnected: Boolean(cp.stripe_account_id),
     coder: {
       id: profile.username || profile.id,
       name,
@@ -75,9 +74,9 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
 }
 
 export const Route = createFileRoute("/coders/$coderId")({
-  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null; stripeConnected: boolean }> => {
+  loader: async ({ params }): Promise<{ coder: Coder; coderUserId: string | null }> => {
     const mock = getCoder(params.coderId);
-    if (mock) return { coder: mock, coderUserId: null, stripeConnected: true };
+    if (mock) return { coder: mock, coderUserId: null };
     const dbCoder = await loadCoderFromDb(params.coderId);
     if (!dbCoder) throw notFound();
     return dbCoder;
@@ -113,13 +112,25 @@ export const Route = createFileRoute("/coders/$coderId")({
 });
 
 function CoderProfile() {
-  const { coder, coderUserId, stripeConnected } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null; stripeConnected: boolean };
+  const { coder, coderUserId } = Route.useLoaderData() as { coder: Coder; coderUserId: string | null };
   const status = statusConfig[coder.status];
   const [briefOpen, setBriefOpen] = useState(false);
   const { user } = useAuth();
   const [connecting, setConnecting] = useState(false);
+  const [stripeConnected, setStripeConnected] = useState<boolean | null>(null);
   const isOwner = Boolean(coderUserId && user && user.id === coderUserId);
-  const showStripeBanner = isOwner && !stripeConnected;
+
+  useEffect(() => {
+    if (!isOwner) { setStripeConnected(null); return; }
+    let cancelled = false;
+    supabase.rpc("get_my_stripe_account_id").then(({ data }) => {
+      if (!cancelled) setStripeConnected(Boolean(data));
+    });
+    return () => { cancelled = true; };
+  }, [isOwner]);
+
+  const showStripeBanner = isOwner && stripeConnected === false;
+
 
   const handleConnectStripe = async () => {
     setConnecting(true);
