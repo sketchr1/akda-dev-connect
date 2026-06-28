@@ -38,6 +38,7 @@ const stepTwoSchema = z.object({
   headline: z.string().trim().min(4).max(100),
   fluency: z.array(z.string()).min(1, "Pick at least one"),
   hourly_rate_usd: z.number().min(1).max(10000),
+  years_experience: z.number().int().min(0).max(80),
 });
 
 const stepThreeSchema = z.object({
