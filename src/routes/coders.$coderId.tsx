@@ -37,7 +37,7 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
 
   const { data: cp } = await supabase
     .from("coder_profiles")
-    .select("profile_id, location, home_language, headline, fluency, hourly_rate_usd, portfolio_urls, bio, availability, commendation_count")
+    .select("profile_id, location, home_language, headline, fluency, hourly_rate_usd, portfolio_urls, bio, availability, commendation_count, years_experience")
     .eq("profile_id", profile.id)
     .maybeSingle();
 
