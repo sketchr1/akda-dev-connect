@@ -92,7 +92,7 @@ function CoderOnboarding() {
       if (!r.success) return toast.error(r.error.issues[0].message);
       setStep(2);
     } else if (step === 2) {
-      const r = stepTwoSchema.safeParse({ headline, fluency, hourly_rate_usd: Number(rate) });
+      const r = stepTwoSchema.safeParse({ headline, fluency, hourly_rate_usd: Number(rate), years_experience: Number(yearsExperience) });
       if (!r.success) return toast.error(r.error.issues[0].message);
       setStep(3);
     }
