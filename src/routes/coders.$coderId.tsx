@@ -37,7 +37,7 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
 
   const { data: cp } = await supabase
     .from("coder_profiles")
-    .select("profile_id, location, home_language, headline, fluency, hourly_rate_usd, portfolio_urls, bio, availability, commendation_count")
+    .select("profile_id, location, home_language, headline, fluency, hourly_rate_usd, portfolio_urls, bio, availability, commendation_count, years_experience")
     .eq("profile_id", profile.id)
     .maybeSingle();
 
@@ -57,9 +57,9 @@ async function loadCoderFromDb(usernameOrId: string): Promise<{ coder: Coder; co
       homeLanguage: cp.home_language ?? "",
       fluency: cp.fluency ?? [],
       status: "open",
-      commendations: 0,
+      commendations: Number(cp.commendation_count ?? 0),
       hourlyRate: Number(cp.hourly_rate_usd ?? 0),
-      yearsExperience: 0,
+      yearsExperience: Number((cp as { years_experience?: number }).years_experience ?? 0),
       location: cp.location ?? "",
       initials: initialsOf(name),
       accent: "from-blue-500 to-cyan-400",

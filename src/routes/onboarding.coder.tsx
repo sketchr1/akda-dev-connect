@@ -38,6 +38,7 @@ const stepTwoSchema = z.object({
   headline: z.string().trim().min(4).max(100),
   fluency: z.array(z.string()).min(1, "Pick at least one"),
   hourly_rate_usd: z.number().min(1).max(10000),
+  years_experience: z.number().int().min(0).max(80),
 });
 
 const stepThreeSchema = z.object({
@@ -61,6 +62,7 @@ function CoderOnboarding() {
   const [headline, setHeadline] = useState("");
   const [fluency, setFluency] = useState<string[]>([]);
   const [rate, setRate] = useState<string>("");
+  const [yearsExperience, setYearsExperience] = useState<string>("");
 
   // Step 3
   const [urls, setUrls] = useState<string[]>([""]);
@@ -90,7 +92,7 @@ function CoderOnboarding() {
       if (!r.success) return toast.error(r.error.issues[0].message);
       setStep(2);
     } else if (step === 2) {
-      const r = stepTwoSchema.safeParse({ headline, fluency, hourly_rate_usd: Number(rate) });
+      const r = stepTwoSchema.safeParse({ headline, fluency, hourly_rate_usd: Number(rate), years_experience: Number(yearsExperience) });
       if (!r.success) return toast.error(r.error.issues[0].message);
       setStep(3);
     }
@@ -121,6 +123,7 @@ function CoderOnboarding() {
       headline,
       fluency,
       hourly_rate_usd: Number(rate),
+      years_experience: Number(yearsExperience),
       portfolio_urls: cleanedUrls,
       bio,
     });
@@ -208,6 +211,9 @@ function CoderOnboarding() {
             </Field>
             <Field label="Hourly rate (USD)">
               <Input type="number" min={1} value={rate} onChange={(e) => setRate(e.target.value)} placeholder="45" />
+            </Field>
+            <Field label="Years of experience">
+              <Input type="number" min={0} max={80} value={yearsExperience} onChange={(e) => setYearsExperience(e.target.value)} placeholder="5" />
             </Field>
           </div>
         )}
