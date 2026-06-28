@@ -7,6 +7,17 @@ import { SendBriefDialog } from "@/components/SendBriefDialog";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import portfolioPlaceholder from "@/assets/portfolio-placeholder.jpg";
+
+function isValidImageUrl(url: string | undefined | null): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 function initialsOf(name: string) {
   return name
