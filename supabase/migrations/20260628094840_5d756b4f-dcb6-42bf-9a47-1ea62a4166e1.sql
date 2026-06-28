@@ -1,0 +1,1 @@
+ALTER TABLE public.coder_profiles ADD COLUMN IF NOT EXISTS years_experience integer NOT NULL DEFAULT 0;

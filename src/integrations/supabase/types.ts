@@ -29,6 +29,7 @@ export type Database = {
           profile_id: string
           stripe_account_id: string | null
           updated_at: string
+          years_experience: number
         }
         Insert: {
           availability?: Database["public"]["Enums"]["coder_availability"]
@@ -44,6 +45,7 @@ export type Database = {
           profile_id: string
           stripe_account_id?: string | null
           updated_at?: string
+          years_experience?: number
         }
         Update: {
           availability?: Database["public"]["Enums"]["coder_availability"]
@@ -59,6 +61,7 @@ export type Database = {
           profile_id?: string
           stripe_account_id?: string | null
           updated_at?: string
+          years_experience?: number
         }
         Relationships: [
           {
