@@ -62,6 +62,7 @@ function CoderOnboarding() {
   const [headline, setHeadline] = useState("");
   const [fluency, setFluency] = useState<string[]>([]);
   const [rate, setRate] = useState<string>("");
+  const [yearsExperience, setYearsExperience] = useState<string>("");
 
   // Step 3
   const [urls, setUrls] = useState<string[]>([""]);
