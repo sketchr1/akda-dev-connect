@@ -123,6 +123,7 @@ function CoderOnboarding() {
       headline,
       fluency,
       hourly_rate_usd: Number(rate),
+      years_experience: Number(yearsExperience),
       portfolio_urls: cleanedUrls,
       bio,
     });
