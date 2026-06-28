@@ -50,7 +50,7 @@ function BrowseCoders() {
     async function load() {
       const { data: rows, error } = await supabase
         .from("coder_profiles")
-        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, availability, commendation_count, profiles!inner(username, display_name)");
+        .select("profile_id, headline, bio, home_language, fluency, hourly_rate_usd, location, availability, commendation_count, profiles(username, display_name)");
       if (cancelled) return;
       if (error) {
         console.error("[coders directory] coder_profiles query failed:", error.message, error);
