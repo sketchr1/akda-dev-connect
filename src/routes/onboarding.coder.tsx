@@ -113,7 +113,15 @@ function CoderOnboarding() {
       .eq("id", user.id);
     if (pErr) {
       setSubmitting(false);
-      return toast.error(pErr.message);
+      const isDuplicateUsername =
+        pErr.code === "23505" ||
+        /duplicate key|already exists|unique constraint/i.test(pErr.message) ||
+        (pErr.message?.toLowerCase().includes("username") ?? false);
+      return toast.error(
+        isDuplicateUsername
+          ? "That username is already taken, please choose another"
+          : pErr.message,
+      );
     }
 
     const { error: cErr } = await supabase.from("coder_profiles").upsert({
