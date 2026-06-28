@@ -212,6 +212,9 @@ function CoderOnboarding() {
             <Field label="Hourly rate (USD)">
               <Input type="number" min={1} value={rate} onChange={(e) => setRate(e.target.value)} placeholder="45" />
             </Field>
+            <Field label="Years of experience">
+              <Input type="number" min={0} max={80} value={yearsExperience} onChange={(e) => setYearsExperience(e.target.value)} placeholder="5" />
+            </Field>
           </div>
         )}
 
