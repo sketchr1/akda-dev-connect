@@ -7,6 +7,17 @@ import { SendBriefDialog } from "@/components/SendBriefDialog";
 import { getCoder, statusConfig, type Coder } from "@/data/coders";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/hooks/use-auth";
+import portfolioPlaceholder from "@/assets/portfolio-placeholder.jpg";
+
+function isValidImageUrl(url: string | undefined | null): boolean {
+  if (!url) return false;
+  try {
+    const u = new URL(url);
+    return u.protocol === "http:" || u.protocol === "https:";
+  } catch {
+    return false;
+  }
+}
 
 function initialsOf(name: string) {
   return name
@@ -310,7 +321,18 @@ function CoderProfile() {
             {coder.portfolio.map((p) => (
               <article key={p.title} className="group overflow-hidden rounded-2xl border border-border bg-card shadow-card transition-all hover:border-akda/50">
                 <div className="relative aspect-[16/10] overflow-hidden bg-surface">
-                  <img src={p.image} alt={p.title} loading="lazy" width={1024} height={640} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                  <img
+                    src={isValidImageUrl(p.image) ? p.image : portfolioPlaceholder}
+                    alt={p.title}
+                    loading="lazy"
+                    width={1024}
+                    height={640}
+                    onError={(e) => {
+                      const img = e.currentTarget;
+                      if (img.src !== portfolioPlaceholder) img.src = portfolioPlaceholder;
+                    }}
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                  />
                   <div className="absolute left-3 top-3 inline-flex items-center gap-1 rounded-full border border-status-open/30 bg-background/80 px-2 py-1 text-[10px] uppercase tracking-wider text-status-open backdrop-blur">
                     <CheckCircle2 className="h-3 w-3" /> Verified
                   </div>
