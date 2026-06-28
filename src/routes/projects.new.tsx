@@ -93,7 +93,11 @@ function PostProjectPage() {
       const { error: eErr } = await supabase
         .from("escrow")
         .insert({ project_id: project.id, status: "pending" });
-      if (eErr) throw eErr;
+      if (eErr) {
+        // Roll back the orphaned project so we don't leave a project without an escrow row.
+        await supabase.from("projects").delete().eq("id", project.id);
+        throw eErr;
+      }
 
       toast.success("Project posted — fund escrow to activate.");
       navigate({ to: "/projects/$projectId/pay", params: { projectId: project.id } });
